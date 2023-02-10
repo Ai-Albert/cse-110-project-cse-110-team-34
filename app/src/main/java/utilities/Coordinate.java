@@ -19,7 +19,7 @@ public class Coordinate {
     @ColumnInfo(name = "latitude")
     public double latitude;
 
-    public Coordinate(String label, double longitude, double latitude) {
+    public Coordinate(String label, double latitude, double longitude) {
         this.id = System.currentTimeMillis();
         this.label = label;
         this.longitude = longitude;
