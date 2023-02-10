@@ -7,6 +7,18 @@ import androidx.room.PrimaryKey;
 
 @Entity
 public class Coordinate {
+    @PrimaryKey
+    public long id;
+
+    @ColumnInfo(name = "label")
+    public String label;
+
+    @ColumnInfo(name = "longitude")
+    public double longitude;
+
+    @ColumnInfo(name = "latitude")
+    public double latitude;
+
     public Coordinate(String label, double longitude, double latitude) {
         this.id = System.currentTimeMillis();
         this.label = label;
@@ -21,15 +33,27 @@ public class Coordinate {
                 this.latitude == c.latitude;
     }
 
-    @PrimaryKey
-    public long id;
+    public String getLabel() {
+        return label;
+    }
 
-    @ColumnInfo(name = "label")
-    public String label;
+    public void setLabel(String label) {
+        this.label = label;
+    }
 
-    @ColumnInfo(name = "longitude")
-    public double longitude;
+    public double getLongitude() {
+        return longitude;
+    }
 
-    @ColumnInfo(name = "latitude")
-    public double latitude;
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
 }
