@@ -20,6 +20,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.Shadows;
+import org.robolectric.shadow.api.Shadow;
 import org.robolectric.shadows.ShadowApplication;
 import org.robolectric.shadows.ShadowLooper;
 
@@ -56,8 +57,8 @@ public class LocationInputTest {
             name.setText("Location 1");
             coords.setText("ab455.26742, 256.21312");
             submit.performClick();
-
-            assertEquals(coords.getError(), null);
+            submit.performClick();
+            assertEquals(remaining_display.getText(), "hello");
         });
 
     }
