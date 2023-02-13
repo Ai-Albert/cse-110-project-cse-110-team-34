@@ -3,62 +3,117 @@ package com.team34.cse_110_project_team_34;
 import static org.junit.Assert.assertEquals;
 
 import android.content.Context;
-import android.os.Looper;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.lifecycle.Lifecycle;
-import androidx.room.Room;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
-import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.Shadows;
-import org.robolectric.shadow.api.Shadow;
-import org.robolectric.shadows.ShadowApplication;
-import org.robolectric.shadows.ShadowLooper;
 
 import utilities.CoordinateDao;
 import utilities.Database;
 
 @RunWith(RobolectricTestRunner.class)
 public class LocationInputTest {
-    private CoordinateDao coordinateDao;
-    private Database database;
+
+    ActivityScenario<MainActivity> scenario;
+    CoordinateDao dao;
 
     @Before
-    public void createDb() {
+    public void preTest() {
         Context context = ApplicationProvider.getApplicationContext();
-        database = Room.inMemoryDatabaseBuilder(context, Database.class).allowMainThreadQueries().build();
-        Database.injectTestDatabase(database);
-        coordinateDao = Database.getInstance(context).getCoordinateDao();
+        dao = Database.getInstance(context).getCoordinateDao();
+        Database.getInstance(context).clearAllTables();
+
+        scenario = ActivityScenario.launch(MainActivity.class);
+        scenario.moveToState(Lifecycle.State.CREATED);
+        scenario.moveToState(Lifecycle.State.STARTED);
+        scenario.moveToState(Lifecycle.State.RESUMED);
     }
 
     @Test
-    public void testAddLocation() {
-        ActivityScenario<MainActivity> context = ActivityScenario.launch(MainActivity.class);
-        context.moveToState(Lifecycle.State.CREATED);
-        context.moveToState(Lifecycle.State.STARTED);
-        context.moveToState(Lifecycle.State.RESUMED);
-        context.onActivity(activity -> {
-            EditText name = (EditText) activity.findViewById(R.id.Coordinates);
-            EditText coords = (EditText) activity.findViewById(R.id.LocationName);
-            Button submit = (Button) activity.findViewById(R.id.Submit);
-            TextView remaining_display = (TextView) activity.findViewById(R.id.remaining);
+    public void testAddNoLocations() {
+        scenario.onActivity(activity -> {
+            TextView remaining_display = activity.findViewById(R.id.remaining);
+            assertEquals("You have 3 locations left.", remaining_display.getText().toString());
+        });
+    }
+
+    @Test
+    public void testAddSingleLocation() {
+        scenario.onActivity(activity -> {
+            EditText name = activity.findViewById(R.id.LocationName);
+            EditText coords = activity.findViewById(R.id.Coordinates);
+            Button submit = activity.findViewById(R.id.Submit);
+            TextView remaining_display = activity.findViewById(R.id.remaining);
+
             name.setText("Location 1");
             coords.setText("455, 256");
             submit.performClick();
-            assertEquals(coordinateDao.getAll().size(), "hello");
-        });
 
+            assertEquals("You have 2 locations left.", remaining_display.getText().toString());
+        });
     }
 
+    @Test
+    public void testAddAllLocations() {
+        scenario.onActivity(activity -> {
+            EditText name = activity.findViewById(R.id.LocationName);
+            EditText coords = activity.findViewById(R.id.Coordinates);
+            Button submit = activity.findViewById(R.id.Submit);
+            TextView remaining_display = activity.findViewById(R.id.remaining);
+
+            name.setText("Location 1");
+            coords.setText("455, 256");
+            submit.performClick();
+            assertEquals("You have 2 locations left.", remaining_display.getText().toString());
+
+            name.setText("Location 2");
+            coords.setText("100, 200");
+            submit.performClick();
+            assertEquals("You have 1 locations left.", remaining_display.getText().toString());
+
+            name.setText("Location 3");
+            coords.setText("200, 300");
+            submit.performClick();
+            assertEquals("You have 0 locations left.", remaining_display.getText().toString());
+        });
+    }
+
+    @Test
+    public void testAddTooManyLocations() {
+        scenario.onActivity(activity -> {
+            EditText name = activity.findViewById(R.id.LocationName);
+            EditText coords = activity.findViewById(R.id.Coordinates);
+            Button submit = activity.findViewById(R.id.Submit);
+            TextView remaining_display = activity.findViewById(R.id.remaining);
+
+            name.setText("Location 1");
+            coords.setText("455, 256");
+            submit.performClick();
+            assertEquals("You have 2 locations left.", remaining_display.getText().toString());
+
+            name.setText("Location 2");
+            coords.setText("100, 200");
+            submit.performClick();
+            assertEquals("You have 1 locations left.", remaining_display.getText().toString());
+
+            name.setText("Location 3");
+            coords.setText("200, 300");
+            submit.performClick();
+            assertEquals("You have 0 locations left.", remaining_display.getText().toString());
+
+            name.setText("Location 4");
+            coords.setText("500, 500");
+            submit.performClick();
+            assertEquals(3, dao.getAll().size());
+            assertEquals("You have 0 locations left.", remaining_display.getText().toString());
+        });
+    }
 }

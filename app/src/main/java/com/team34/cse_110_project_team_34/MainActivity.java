@@ -20,12 +20,6 @@ import utilities.Database;
 public class MainActivity extends AppCompatActivity {
     private CoordinateDao coordinateDao;
 
-
-    private ExecutorService backgroundThreadExecutor = Executors.newSingleThreadExecutor();
-    private ExecutorService backgroundThreadExecutor2 = Executors.newSingleThreadExecutor();
-    private Future<Void> future;
-    private Future<Void> future2;
-
     private int remainingLocations;
 
     private EditText coordinates;
@@ -36,18 +30,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        coordinates = (EditText) findViewById(R.id.Coordinates);
-        remain = (TextView) findViewById(R.id.remaining);
-        location_name = (EditText) findViewById(R.id.LocationName);
-        Button submit = (Button) findViewById(R.id.Submit);
-        submit.setOnClickListener(this::onSubmit);
+
+        coordinates = findViewById(R.id.Coordinates);
+        remain = findViewById(R.id.remaining);
+        location_name = findViewById(R.id.LocationName);
 
         coordinateDao = Database.getInstance(this).getCoordinateDao();
         remainingLocations = 3 - coordinateDao.getAll().size();
         remain.setText("You have " + remainingLocations + " locations left.");
-
-
     }
+
     public boolean verifyCoordinate(String[] coordinateString) {
         if (coordinateString.length != 2) {
             coordinates.setError("Coordinates should be in the format (latitude, longitude)");
@@ -79,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         String place_name = location_name.getText().toString();
         Coordinate new_coordinate = new Coordinate(place_name, latitude, longitude);
         coordinateDao.insert(new_coordinate);
+
         remainingLocations = 3 - coordinateDao.getAll().size();
         remain.setText("You have " + remainingLocations + " locations left.");
     }
