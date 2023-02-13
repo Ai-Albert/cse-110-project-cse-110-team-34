@@ -7,6 +7,9 @@ import androidx.room.PrimaryKey;
 
 @Entity
 public class Coordinate {
+
+    private static int nextId = 0;
+
     @PrimaryKey
     public long id;
 
@@ -20,10 +23,11 @@ public class Coordinate {
     public double latitude;
 
     public Coordinate(String label, double latitude, double longitude) {
-        this.id = System.currentTimeMillis();
+        this.id = nextId;
         this.label = label;
         this.longitude = longitude;
         this.latitude = latitude;
+        nextId++;
     }
 
     public boolean equals(Coordinate c) {

@@ -1,43 +1,33 @@
 package com.team34.cse_110_project_team_34;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
 
 import static org.junit.Assert.*;
 
 import android.content.Context;
 
-import androidx.annotation.VisibleForTesting;
-import androidx.room.Room;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import utilities.Coordinate;
 import utilities.Database;
 import utilities.CoordinateDao;
 
-@RunWith(RobolectricTestRunner.class)
+@RunWith(AndroidJUnit4.class)
 public class DatabaseTest {
 
     private CoordinateDao coordinateDao;
     private Database database;
 
-    @VisibleForTesting
+    @Before
     public void createDb() {
         Context context = ApplicationProvider.getApplicationContext();
         coordinateDao = Database.getInstance(context).getCoordinateDao();
-    }
-
-    @After
-    public void destroyDb() {
-        database.close();
+        Database.getInstance(context).clearAllTables();
     }
 
     @Test
