@@ -21,7 +21,6 @@ import utilities.CoordinateDao;
 public class DatabaseTest {
 
     private CoordinateDao coordinateDao;
-    private Database database;
 
     @Before
     public void createDb() {
