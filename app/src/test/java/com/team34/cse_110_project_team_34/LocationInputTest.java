@@ -8,7 +8,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.lifecycle.Lifecycle;
 import androidx.room.Room;
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
@@ -44,20 +46,24 @@ public class LocationInputTest {
         database.close();
     }
 
-    @Rule
-    public ActivityScenarioRule context = new ActivityScenarioRule<>(MainActivity.class);
-
     @Test
-    public void testStudentNameIsDisplayed() {
-        context.getScenario().onActivity(activity -> {
+    public void testAddLocation() {
+        ActivityScenario<MainActivity> context = ActivityScenario.launch(MainActivity.class);
+        context.moveToState(Lifecycle.State.CREATED);
+        context.moveToState(Lifecycle.State.STARTED);
+        context.onActivity(activity -> {
             EditText name = (EditText) activity.findViewById(R.id.Coordinates);
             EditText coords = (EditText) activity.findViewById(R.id.LocationName);
             Button submit = (Button) activity.findViewById(R.id.Submit);
             TextView remaining_display = (TextView) activity.findViewById(R.id.remaining);
             name.setText("Location 1");
-            coords.setText("ab455.26742, 256.21312");
+            coords.setText("455, 256");
             submit.performClick();
-            submit.performClick();
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             assertEquals(remaining_display.getText(), "hello");
         });
 

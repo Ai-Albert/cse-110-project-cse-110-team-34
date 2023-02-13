@@ -5,6 +5,7 @@ import androidx.room.Room;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -23,7 +24,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     private ExecutorService backgroundThreadExecutor = Executors.newSingleThreadExecutor();
+    private ExecutorService backgroundThreadExecutor2 = Executors.newSingleThreadExecutor();
     private Future<Void> future;
+    private Future<Void> future2;
 
     private int remainingLocations;
 
@@ -38,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
         coordinates = (EditText) findViewById(R.id.Coordinates);
         remain = (TextView) findViewById(R.id.remaining);
         location_name = (EditText) findViewById(R.id.LocationName);
-
+        Button submit = (Button) findViewById(R.id.Submit);
+        submit.setOnClickListener(this::onSubmit);
         database = Room.inMemoryDatabaseBuilder(getApplicationContext(), Database.class).build();
 
         future = backgroundThreadExecutor.submit(() -> {
@@ -82,11 +86,12 @@ public class MainActivity extends AppCompatActivity {
 
         String place_name = location_name.getText().toString();
         Coordinate new_coordinate = new Coordinate(place_name, latitude, longitude);
-        this.future = backgroundThreadExecutor.submit(() -> {
+        this.future2 = backgroundThreadExecutor2.submit(() -> {
             coordinateDao.insert(new_coordinate);
             remainingLocations = 3 - coordinateDao.getAll().size();
+            final int remainingCopy = remainingLocations;
             runOnUiThread(() -> {
-                remain.setText("You have " + remainingLocations + " locations left.");
+                remain.setText("You have " + remainingCopy + " locations left.");
             });
             return null;
         });
