@@ -2,10 +2,8 @@ package utilities;
 
 import android.content.Context;
 
-import androidx.annotation.NonNull;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
-import androidx.sqlite.db.SupportSQLiteDatabase;
 
 @androidx.room.Database(entities = {Coordinate.class}, version = 1)
 public abstract class Database extends RoomDatabase {

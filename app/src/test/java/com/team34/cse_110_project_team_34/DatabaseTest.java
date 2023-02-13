@@ -1,15 +1,15 @@
 package com.team34.cse_110_project_team_34;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static org.junit.Assert.*;
 
 import android.content.Context;
 
-import androidx.room.Room;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import java.util.List;
 
@@ -17,21 +17,16 @@ import utilities.Coordinate;
 import utilities.Database;
 import utilities.CoordinateDao;
 
+@RunWith(AndroidJUnit4.class)
 public class DatabaseTest {
 
     private CoordinateDao coordinateDao;
-    private Database database;
 
     @Before
     public void createDb() {
         Context context = ApplicationProvider.getApplicationContext();
-        database = Room.inMemoryDatabaseBuilder(context, Database.class).build();
-        coordinateDao = database.getCoordinateDao();
-    }
-
-    @After
-    public void destroyDb() {
-        database.close();
+        coordinateDao = Database.getInstance(context).getCoordinateDao();
+        Database.getInstance(context).clearAllTables();
     }
 
     @Test

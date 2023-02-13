@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey;
 
 @Entity
 public class Coordinate {
+
     private static int nextId = 0;
 
     @PrimaryKey
