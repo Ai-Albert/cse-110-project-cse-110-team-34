@@ -3,30 +3,36 @@ package com.team34.cse_110_project_team_34;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import static org.junit.Assert.*;
 
 import android.content.Context;
 
+import androidx.annotation.VisibleForTesting;
 import androidx.room.Room;
 import androidx.test.core.app.ApplicationProvider;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import utilities.Coordinate;
 import utilities.Database;
 import utilities.CoordinateDao;
 
+@RunWith(RobolectricTestRunner.class)
 public class DatabaseTest {
 
     private CoordinateDao coordinateDao;
     private Database database;
 
-    @Before
+    @VisibleForTesting
     public void createDb() {
         Context context = ApplicationProvider.getApplicationContext();
-        database = Room.inMemoryDatabaseBuilder(context, Database.class).build();
-        coordinateDao = database.getCoordinateDao();
+        coordinateDao = Database.getInstance(context).getCoordinateDao();
     }
 
     @After

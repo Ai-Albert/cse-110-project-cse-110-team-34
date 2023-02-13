@@ -18,8 +18,6 @@ import utilities.CoordinateDao;
 import utilities.Database;
 
 public class MainActivity extends AppCompatActivity {
-
-    private Database database;
     private CoordinateDao coordinateDao;
 
 
@@ -43,16 +41,10 @@ public class MainActivity extends AppCompatActivity {
         location_name = (EditText) findViewById(R.id.LocationName);
         Button submit = (Button) findViewById(R.id.Submit);
         submit.setOnClickListener(this::onSubmit);
-        database = Room.inMemoryDatabaseBuilder(getApplicationContext(), Database.class).build();
 
-        future = backgroundThreadExecutor.submit(() -> {
-            coordinateDao = database.getCoordinateDao();
-            remainingLocations = 3 - coordinateDao.getAll().size();
-            runOnUiThread(() -> {
-                remain.setText("You have " + remainingLocations + " locations left.");
-            });
-            return null;
-        });
+        coordinateDao = Database.getInstance(this).getCoordinateDao();
+        remainingLocations = 3 - coordinateDao.getAll().size();
+        remain.setText("You have " + remainingLocations + " locations left.");
 
 
     }
@@ -86,20 +78,14 @@ public class MainActivity extends AppCompatActivity {
 
         String place_name = location_name.getText().toString();
         Coordinate new_coordinate = new Coordinate(place_name, latitude, longitude);
-        this.future2 = backgroundThreadExecutor2.submit(() -> {
-            coordinateDao.insert(new_coordinate);
-            remainingLocations = 3 - coordinateDao.getAll().size();
-            final int remainingCopy = remainingLocations;
-            runOnUiThread(() -> {
-                remain.setText("You have " + remainingCopy + " locations left.");
-            });
-            return null;
-        });
+        coordinateDao.insert(new_coordinate);
+        remainingLocations = 3 - coordinateDao.getAll().size();
+        remain.setText("You have " + remainingLocations + " locations left.");
     }
 
     @Override
     protected void onDestroy() {
-        database.close();
+        Database.getInstance(this).close();
         super.onDestroy();
     }
 }

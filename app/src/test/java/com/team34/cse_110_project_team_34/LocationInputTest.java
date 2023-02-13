@@ -37,13 +37,9 @@ public class LocationInputTest {
     @Before
     public void createDb() {
         Context context = ApplicationProvider.getApplicationContext();
-        database = Room.inMemoryDatabaseBuilder(context, Database.class).build();
-        coordinateDao = database.getCoordinateDao();
-    }
-
-    @After
-    public void destroyDb() {
-        database.close();
+        database = Room.inMemoryDatabaseBuilder(context, Database.class).allowMainThreadQueries().build();
+        Database.injectTestDatabase(database);
+        coordinateDao = Database.getInstance(context).getCoordinateDao();
     }
 
     @Test
@@ -51,6 +47,7 @@ public class LocationInputTest {
         ActivityScenario<MainActivity> context = ActivityScenario.launch(MainActivity.class);
         context.moveToState(Lifecycle.State.CREATED);
         context.moveToState(Lifecycle.State.STARTED);
+        context.moveToState(Lifecycle.State.RESUMED);
         context.onActivity(activity -> {
             EditText name = (EditText) activity.findViewById(R.id.Coordinates);
             EditText coords = (EditText) activity.findViewById(R.id.LocationName);
@@ -59,7 +56,7 @@ public class LocationInputTest {
             name.setText("Location 1");
             coords.setText("455, 256");
             submit.performClick();
-            assertEquals(true, true);
+            assertEquals(coordinateDao.getAll().size(), "hello");
         });
 
     }
