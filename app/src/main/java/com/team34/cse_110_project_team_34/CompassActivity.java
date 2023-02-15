@@ -4,10 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import utilities.OrientationService;
 
 public class CompassActivity extends AppCompatActivity {
+
     private OrientationService orientationService;
 
     @Override
@@ -19,8 +21,7 @@ public class CompassActivity extends AppCompatActivity {
         ImageView compass = findViewById(R.id.compass);
 
         orientationService.getOrientation().observe(this, orientation -> {
-            compass.setRotation(Math.toDegrees(orientation));
+            compass.setRotation(360 - (float) Math.toDegrees(orientation));
         });
-
     }
 }
