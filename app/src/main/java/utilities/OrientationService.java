@@ -55,7 +55,7 @@ public class OrientationService implements SensorEventListener {
 
     private void onBothSensorDataAvailable() {
         if (accelerometerReading == null || magnetometerReading == null) {
-            throw new IllegalStateException("Both sensors must be available to compute orientation")
+            throw new IllegalStateException("Both sensors must be available to compute orientation");
         }
 
         float[] r = new float[9];
