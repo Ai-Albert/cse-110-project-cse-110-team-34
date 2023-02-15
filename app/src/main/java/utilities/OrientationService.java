@@ -18,7 +18,7 @@ public class OrientationService implements SensorEventListener {
     private float[] magnetometerReading;
     private MutableLiveData<Float> azimuth;
 
-    public static OrientationService singleton(Activity activity) {
+    public static OrientationService getInstance(Activity activity) {
         if (instance == null) {
             instance = new OrientationService(activity);
         }
@@ -54,9 +54,7 @@ public class OrientationService implements SensorEventListener {
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
+    public void onAccuracyChanged(Sensor sensor, int accuracy) { }
 
     private void onBothSensorDataAvailable() {
         if (accelerometerReading == null || magnetometerReading == null) {
