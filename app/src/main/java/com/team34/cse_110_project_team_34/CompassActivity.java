@@ -3,6 +3,7 @@ package com.team34.cse_110_project_team_34;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.widget.ImageView;
 
 import utilities.OrientationService;
 
@@ -14,7 +15,12 @@ public class CompassActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compass);
 
-        orientationService = new OrientationService();
+        orientationService = new OrientationService(this);
+        ImageView compass = findViewById(R.id.compass);
+
+        orientationService.getOrientation().observe(this, orientation -> {
+            compass.setRotation(Math.toDegrees(orientation));
+        });
 
     }
 }

@@ -25,7 +25,7 @@ public class OrientationService implements SensorEventListener {
         return instance;
     }
 
-    protected OrientationService(Activity activity) {
+    public OrientationService(Activity activity) {
         this.azimuth = new MutableLiveData<>();
         this.sensorManager = (SensorManager) activity.getSystemService(Context.SENSOR_SERVICE);
         this.registerSensorListeners();
@@ -51,6 +51,11 @@ public class OrientationService implements SensorEventListener {
         if (accelerometerReading != null && magnetometerReading != null) {
             onBothSensorDataAvailable();
         }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 
     private void onBothSensorDataAvailable() {
