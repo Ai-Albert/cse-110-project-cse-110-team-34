@@ -22,7 +22,7 @@ import utilities.Database;
 @RunWith(RobolectricTestRunner.class)
 public class LocationInputTest {
 
-    ActivityScenario<MainActivity> scenario;
+    ActivityScenario<AddActivity> scenario;
     CoordinateDao dao;
 
     @Before
@@ -31,7 +31,7 @@ public class LocationInputTest {
         dao = Database.getInstance(context).getCoordinateDao();
         Database.getInstance(context).clearAllTables();
 
-        scenario = ActivityScenario.launch(MainActivity.class);
+        scenario = ActivityScenario.launch(AddActivity.class);
         scenario.moveToState(Lifecycle.State.CREATED);
         scenario.moveToState(Lifecycle.State.STARTED);
         scenario.moveToState(Lifecycle.State.RESUMED);
