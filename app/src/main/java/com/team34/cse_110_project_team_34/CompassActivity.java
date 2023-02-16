@@ -1,6 +1,7 @@
 package com.team34.cse_110_project_team_34;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -22,10 +23,7 @@ public class CompassActivity extends AppCompatActivity {
         orientationService = OrientationService.getInstance(this);
         locationService = LocationService.getInstance(this);
 
-        ImageView compass = findViewById(R.id.compass);
-        orientationService.getOrientation().observe(this, orientation -> {
-            compass.setRotation(360 - (float) Math.toDegrees(orientation));
-        });
+        this.observeOrientation();
     }
 
     @Override
@@ -49,5 +47,12 @@ public class CompassActivity extends AppCompatActivity {
         super.onPause();
         orientationService.unregisterSensorListeners();
         locationService.unregisterLocationListener();
+    }
+
+    public void observeOrientation() {
+        ImageView compass = findViewById(R.id.compass);
+        orientationService.getOrientation().observe(this, orientation -> {
+            compass.setRotation(360 - (float) Math.toDegrees(orientation));
+        });
     }
 }
