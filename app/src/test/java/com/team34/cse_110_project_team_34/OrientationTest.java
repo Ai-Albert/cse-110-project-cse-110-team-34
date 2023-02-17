@@ -44,14 +44,13 @@ public class OrientationTest {
 
         scenario.onActivity(activity -> {
             OrientationService orientationService = OrientationService.getInstance(activity);
-
             MutableLiveData<Float> mockOrientation = new MutableLiveData<Float>();
+
+            mockOrientation.setValue(testValue);
             orientationService.setMockOrientationSource(mockOrientation);
             activity.observeOrientation();
-            mockOrientation.setValue(testValue);
 
             ImageView compass = activity.findViewById(R.id.compass);
-
             assertEquals(Math.toDegrees(testValue), compass.getRotation(), 1);
         });
     }
