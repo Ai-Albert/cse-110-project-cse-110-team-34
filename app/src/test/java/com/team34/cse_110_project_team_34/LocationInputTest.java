@@ -3,6 +3,7 @@ package com.team34.cse_110_project_team_34;
 import static org.junit.Assert.assertEquals;
 
 import android.content.Context;
+import android.content.Intent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -11,6 +12,7 @@ import androidx.lifecycle.Lifecycle;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 
+import org.bouncycastle.util.test.FixedSecureRandom;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +33,9 @@ public class LocationInputTest {
         dao = Database.getInstance(context).getCoordinateDao();
         Database.getInstance(context).clearAllTables();
 
-        scenario = ActivityScenario.launch(AddActivity.class);
+        Intent intent = new Intent(ApplicationProvider.getApplicationContext(), AddActivity.class);
+        intent.putExtra("from_compass", false);
+        scenario = ActivityScenario.launch(intent);
         scenario.moveToState(Lifecycle.State.CREATED);
         scenario.moveToState(Lifecycle.State.STARTED);
         scenario.moveToState(Lifecycle.State.RESUMED);
@@ -116,4 +120,16 @@ public class LocationInputTest {
             assertEquals("You have 0 locations left.", remaining_display.getText().toString());
         });
     }
+
+//    @Test
+//    public void testSkip() {
+//        scenario.onActivity(activity -> {
+//            Button skip = activity.findViewById(R.id.skip);
+//            TextView remaining_display = activity.findViewById(R.id.remaining);
+//
+//            skip.performClick();
+//            assertEquals(0, Database.getInstance(activity).getCoordinateDao().getAll().size());
+//            assertEquals("You have 3 locations left.", remaining_display.getText().toString());
+//        });
+//    }
 }
