@@ -56,7 +56,6 @@ public class CompassActivity extends AppCompatActivity {
 
     public void onAdd(View view) {
         Intent intent = new Intent(this, AddActivity.class);
-        intent.putExtra("from_compass", true);
         startActivity(intent);
     }
 }

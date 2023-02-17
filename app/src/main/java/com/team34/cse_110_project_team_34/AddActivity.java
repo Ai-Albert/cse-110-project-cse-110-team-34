@@ -32,7 +32,6 @@ public class AddActivity extends AppCompatActivity {
         remain = findViewById(R.id.remaining);
         location_name = findViewById(R.id.LocationName);
         skip = findViewById(R.id.skip);
-        Button back = findViewById(R.id.back);
 
         coordinateDao = Database.getInstance(this).getCoordinateDao();
         remainingLocations = 3 - coordinateDao.getAll().size();
@@ -41,13 +40,6 @@ public class AddActivity extends AppCompatActivity {
         if (remainingLocations == 3) {
             skip.setVisibility(View.INVISIBLE);
             skip.setClickable(false);
-        }
-
-        Bundle extra = getIntent().getExtras();
-        boolean fromCompass = extra.getBoolean("from_compass");
-        if (!fromCompass) {
-            back.setVisibility(View.INVISIBLE);
-            back.setClickable(false);
         }
     }
 

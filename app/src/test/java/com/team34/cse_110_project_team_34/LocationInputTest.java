@@ -33,9 +33,7 @@ public class LocationInputTest {
         dao = Database.getInstance(context).getCoordinateDao();
         Database.getInstance(context).clearAllTables();
 
-        Intent intent = new Intent(ApplicationProvider.getApplicationContext(), AddActivity.class);
-        intent.putExtra("from_compass", false);
-        scenario = ActivityScenario.launch(intent);
+        scenario = ActivityScenario.launch(AddActivity.class);
         scenario.moveToState(Lifecycle.State.CREATED);
         scenario.moveToState(Lifecycle.State.STARTED);
         scenario.moveToState(Lifecycle.State.RESUMED);
@@ -121,15 +119,15 @@ public class LocationInputTest {
         });
     }
 
-//    @Test
-//    public void testSkip() {
-//        scenario.onActivity(activity -> {
-//            Button skip = activity.findViewById(R.id.skip);
-//            TextView remaining_display = activity.findViewById(R.id.remaining);
-//
-//            skip.performClick();
-//            assertEquals(0, Database.getInstance(activity).getCoordinateDao().getAll().size());
-//            assertEquals("You have 3 locations left.", remaining_display.getText().toString());
-//        });
-//    }
+    @Test
+    public void testSkip() {
+        scenario.onActivity(activity -> {
+            Button skip = activity.findViewById(R.id.skip);
+            TextView remaining_display = activity.findViewById(R.id.remaining);
+
+            skip.performClick();
+            assertEquals(0, Database.getInstance(activity).getCoordinateDao().getAll().size());
+            assertEquals("You have 2 locations left.", remaining_display.getText().toString());
+        });
+    }
 }

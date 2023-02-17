@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
         CoordinateDao coordinateDao = Database.getInstance(this).getCoordinateDao();
         if (coordinateDao.getAll().size() == 0) {
             Intent intent = new Intent(this, AddActivity.class);
-            intent.putExtra("from_compass", false);
             startActivity(intent);
         }
         else {
