@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.media.Image;
 import android.provider.SyncStateContract;
 import android.widget.ImageView;
 
@@ -34,20 +35,24 @@ public class OrientationTest {
         scenario.moveToState(Lifecycle.State.RESUMED);
     }
 
+    // OrientationService's azimuth is in radians
+    // Compass's rotation is in degrees
     @Test
     public void testOrientation() {
-        float testValue = 180;
+        float testValue = (float) Math.PI;
         ActivityScenario<CompassActivity> scenario = ActivityScenario.launch(CompassActivity.class);
+
         scenario.onActivity(activity -> {
             OrientationService orientationService = OrientationService.getInstance(activity);
+
             MutableLiveData<Float> mockOrientation = new MutableLiveData<Float>();
             orientationService.setMockOrientationSource(mockOrientation);
             activity.observeOrientation();
-
             mockOrientation.setValue(testValue);
-            ImageView compass = activity.findViewById(R.id.compass);
-            assertEquals(compass.getRotation(),testValue, 1);
 
+            ImageView compass = activity.findViewById(R.id.compass);
+
+            assertEquals(Math.toDegrees(testValue), compass.getRotation(), 1);
         });
     }
 }

@@ -22,7 +22,6 @@ public class CompassActivity extends AppCompatActivity {
 
         orientationService = OrientationService.getInstance(this);
         locationService = LocationService.getInstance(this);
-
         this.observeOrientation();
     }
 
@@ -36,10 +35,7 @@ public class CompassActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        ImageView compass = findViewById(R.id.compass);
-        orientationService.getOrientation().observe(this, orientation -> {
-            compass.setRotation(360 - (float) Math.toDegrees(orientation));
-        });
+        observeOrientation();
     }
 
     @Override
