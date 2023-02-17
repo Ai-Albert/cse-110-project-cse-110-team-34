@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 public class LocationService implements LocationListener {
 

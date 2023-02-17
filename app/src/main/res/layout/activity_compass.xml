@@ -25,6 +25,36 @@
             app:srcCompat="@drawable/compass"
             tools:layout_editor_absoluteX="0dp"
             tools:layout_editor_absoluteY="0dp" />
+        <ImageView
+            android:id="@+id/location_1"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            app:layout_constraintCircle="@+id/clock"
+            app:layout_constraintCircleAngle="100"
+            app:layout_constraintCircleRadius="185dp"
+            app:srcCompat="@drawable/sad_android"
+            tools:layout_editor_absoluteX="50dp"
+            tools:layout_editor_absoluteY="-2dp" />
+        <ImageView
+            android:id="@+id/location_2"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            app:layout_constraintCircle="@+id/clock"
+            app:layout_constraintCircleAngle="50"
+            app:layout_constraintCircleRadius="180dp"
+            app:srcCompat="@drawable/sad_android"
+            tools:layout_editor_absoluteX="50dp"
+            tools:layout_editor_absoluteY="-2dp" />
+        <ImageView
+            android:id="@+id/location_3"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            app:layout_constraintCircle="@+id/clock"
+            app:layout_constraintCircleAngle="210"
+            app:layout_constraintCircleRadius="185dp"
+            app:srcCompat="@drawable/sad_android"
+            tools:layout_editor_absoluteX="50dp"
+            tools:layout_editor_absoluteY="-2dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
