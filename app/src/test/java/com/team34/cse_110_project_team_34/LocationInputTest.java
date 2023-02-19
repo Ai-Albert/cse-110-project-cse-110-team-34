@@ -127,7 +127,7 @@ public class LocationInputTest {
 
             skip.performClick();
             assertEquals(0, Database.getInstance(activity).getCoordinateDao().getAll().size());
-            assertEquals("You have 2 locations left.", remaining_display.getText().toString());
+            assertEquals("You have 3 locations left.", remaining_display.getText().toString());
         });
     }
 }

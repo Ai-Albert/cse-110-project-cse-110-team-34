@@ -61,7 +61,7 @@ public class CompassActivity extends AppCompatActivity {
         lastUserLong = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().second : 0;
 
         for (int location: location_ids) {
-            ImageView location_view = findViewById(location);
+            TextView location_view = findViewById(location);
             location_view.setVisibility(View.INVISIBLE);
             ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) location_view.getLayoutParams();
             layoutParams.circleRadius = (Math.min(getScreenHeight(), getScreenWidth()) / 2) - 100;
@@ -83,9 +83,9 @@ public class CompassActivity extends AppCompatActivity {
         locations = coordinateDao.getAll();
         int location_number = 0;
         for (Coordinate location: locations) {
-            ImageView location_view = findViewById(location_ids[location_number]);
+            TextView location_view = findViewById(location_ids[location_number]);
             location_view.setVisibility(View.VISIBLE);
-
+            location_view.setText(location.getLabel());
             ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) location_view.getLayoutParams();
             float azimuth = getAngle(Math.toRadians(lastUserLat), Math.toRadians(lastUserLong), Math.toRadians(location.latitude), Math.toRadians(location.longitude));
             layoutParams.circleAngle = compass.getRotation() + azimuth;
@@ -114,7 +114,7 @@ public class CompassActivity extends AppCompatActivity {
         });
     }
 
-    private float getAngle(double lat1, double long1, double lat2, double long2) {
+    public float getAngle(double lat1, double long1, double lat2, double long2) {
         double dLong = (long2 - long1);
 
         double y = Math.sin(dLong) * Math.cos(lat2);
