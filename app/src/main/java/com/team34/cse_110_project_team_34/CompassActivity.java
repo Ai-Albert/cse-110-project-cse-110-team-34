@@ -3,10 +3,12 @@ package com.team34.cse_110_project_team_34;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.util.Pair;
 import androidx.lifecycle.LiveData;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.location.GpsStatus;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -23,15 +25,18 @@ import utilities.OrientationService;
 
 public class CompassActivity extends AppCompatActivity {
 
+    private CoordinateDao coordinateDao;
     private OrientationService orientationService;
     private LocationService locationService;
 
-    private CoordinateDao coordinateDao;
-
     private List<Coordinate> locations;
+    final int[] location_ids = {R.id.location_1, R.id.location_2, R.id.location_3};
+
+    private double lastOrientation;
+    private double lastUserLat;
+    private double lastUserLong;
 
     private ImageView compass;
-    final int[] location_ids = {R.id.location_1, R.id.location_2, R.id.location_3};
 
     public static int getScreenWidth() {
         return Resources.getSystem().getDisplayMetrics().widthPixels;
@@ -46,12 +51,14 @@ public class CompassActivity extends AppCompatActivity {
         setContentView(R.layout.activity_compass);
 
         coordinateDao = Database.getInstance(this).getCoordinateDao();
-        locations = coordinateDao.getAll();
-
         orientationService = OrientationService.getInstance(this);
         locationService = LocationService.getInstance(this);
 
         compass = findViewById(R.id.compass);
+
+        lastOrientation = 0;
+        lastUserLat = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().first : 0;
+        lastUserLong = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().second : 0;
 
         for (int location: location_ids) {
             ImageView location_view = findViewById(location);
@@ -61,7 +68,8 @@ public class CompassActivity extends AppCompatActivity {
             location_view.setLayoutParams(layoutParams);
         }
 
-        this.observeOrientation();
+        observeLocation();
+        observeOrientation();
     }
 
     @Override
@@ -71,33 +79,51 @@ public class CompassActivity extends AppCompatActivity {
         locationService.unregisterLocationListener();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        observeOrientation();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        orientationService.unregisterSensorListeners();
-        locationService.unregisterLocationListener();
-    }
-
-    public void observeOrientation() {
-        orientationService.getOrientation().observe(this, orientation -> {
-            compass.setRotation(360 - (float) Math.toDegrees(orientation));
-        });
+    public void updatePerimeter() {
+        locations = coordinateDao.getAll();
         int location_number = 0;
         for (Coordinate location: locations) {
             ImageView location_view = findViewById(location_ids[location_number]);
             location_view.setVisibility(View.VISIBLE);
+
             ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) location_view.getLayoutParams();
-            layoutParams.circleAngle = 120 * location_number;
+            float azimuth = getAngle(Math.toRadians(lastUserLat), Math.toRadians(lastUserLong), Math.toRadians(location.latitude), Math.toRadians(location.longitude));
+            layoutParams.circleAngle = compass.getRotation() + azimuth;
             location_view.setLayoutParams(layoutParams);
+
             location_number++;
         }
     }
+
+    public void observeOrientation() {
+        orientationService.getOrientation().observe(this, orientation -> {
+            float newOrientation = 360 - (float) Math.toDegrees(orientation);
+            if (Math.abs(compass.getRotation() - newOrientation) >= 3) {
+                compass.setRotation(newOrientation);
+                lastOrientation = newOrientation;
+            }
+            updatePerimeter();
+        });
+    }
+
+    public void observeLocation() {
+        locationService.getLocation().observe(this, location -> {
+            lastUserLat = location.first;
+            lastUserLong = location.second;
+            updatePerimeter();
+        });
+    }
+
+    private float getAngle(double lat1, double long1, double lat2, double long2) {
+        double dLong = (long2 - long1);
+
+        double y = Math.sin(dLong) * Math.cos(lat2);
+        double x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLong);
+        double angle = Math.atan2(y, x);
+
+        return (float) (Math.toDegrees(angle) + 360) % 360;
+    }
+
 
     public void onAdd(View view) {
         Intent intent = new Intent(this, AddActivity.class);

@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.team34.cse_110_project_team_34"
-        minSdk 30
+        minSdk 29
         targetSdk 30
         versionCode 1
         versionName "1.0"
