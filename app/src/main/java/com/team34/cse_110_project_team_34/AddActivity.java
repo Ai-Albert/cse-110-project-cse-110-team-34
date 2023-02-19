@@ -2,8 +2,10 @@ package com.team34.cse_110_project_team_34;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -19,19 +21,26 @@ public class AddActivity extends AppCompatActivity {
     private EditText coordinates;
     private EditText location_name;
     private TextView remain;
+    private Button skip;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_add);
 
         coordinates = findViewById(R.id.Coordinates);
         remain = findViewById(R.id.remaining);
         location_name = findViewById(R.id.LocationName);
+        skip = findViewById(R.id.skip);
 
         coordinateDao = Database.getInstance(this).getCoordinateDao();
         remainingLocations = 3 - coordinateDao.getAll().size();
         remain.setText("You have " + remainingLocations + " locations left.");
+
+        if (remainingLocations == 3) {
+            skip.setVisibility(View.INVISIBLE);
+            skip.setClickable(false);
+        }
     }
 
     public boolean verifyCoordinate(String[] coordinateString) {
@@ -47,6 +56,15 @@ public class AddActivity extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+
+    public void onSkip(View view) {
+        remainingLocations--;
+        remain.setText("You have " + remainingLocations + " locations left.");
+        if (remainingLocations == 0) {
+            Intent intent = new Intent(this, CompassActivity.class);
+            startActivity(intent);
+        }
     }
 
     public void onSubmit(View view) {
@@ -66,13 +84,26 @@ public class AddActivity extends AppCompatActivity {
         Coordinate new_coordinate = new Coordinate(place_name, latitude, longitude);
         coordinateDao.insert(new_coordinate);
 
-        remainingLocations = 3 - coordinateDao.getAll().size();
+        remainingLocations--;
         remain.setText("You have " + remainingLocations + " locations left.");
+
+        skip.setVisibility(View.VISIBLE);
+        skip.setClickable(true);
+
+        if (remainingLocations == 0) {
+            Intent intent = new Intent(this, CompassActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 
     @Override
     protected void onDestroy() {
         Database.getInstance(this).close();
         super.onDestroy();
+    }
+
+    public void onBack(View view) {
+        finish();
     }
 }
