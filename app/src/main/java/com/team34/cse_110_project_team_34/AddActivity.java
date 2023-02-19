@@ -61,6 +61,10 @@ public class AddActivity extends AppCompatActivity {
     public void onSkip(View view) {
         remainingLocations--;
         remain.setText("You have " + remainingLocations + " locations left.");
+
+        location_name.setText("");
+        coordinates.setText("");
+
         if (remainingLocations == 0) {
             Intent intent = new Intent(this, CompassActivity.class);
             startActivity(intent);
@@ -89,6 +93,9 @@ public class AddActivity extends AppCompatActivity {
 
         skip.setVisibility(View.VISIBLE);
         skip.setClickable(true);
+
+        location_name.setText("");
+        coordinates.setText("");
 
         if (remainingLocations == 0) {
             Intent intent = new Intent(this, CompassActivity.class);

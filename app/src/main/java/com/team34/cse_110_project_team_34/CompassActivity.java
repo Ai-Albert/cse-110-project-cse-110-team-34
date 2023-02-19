@@ -98,7 +98,7 @@ public class CompassActivity extends AppCompatActivity {
     public void observeOrientation() {
         orientationService.getOrientation().observe(this, orientation -> {
             float newOrientation = 360 - (float) Math.toDegrees(orientation);
-            if (Math.abs(compass.getRotation() - newOrientation) >= 3) {
+            if (Math.abs(compass.getRotation() - newOrientation) % 360 >= 1) {
                 compass.setRotation(newOrientation);
                 lastOrientation = newOrientation;
             }
