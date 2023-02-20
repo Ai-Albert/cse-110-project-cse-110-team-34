@@ -97,12 +97,7 @@ public class CompassTest {
 
             activity.updatePerimeter();
 
-            float azimuth = Calculation.getAngle(
-                    Math.toRadians(testLocationLat),
-                    Math.toRadians(testLocationLong),
-                    Math.toRadians(c1.getLatitude()),
-                    Math.toRadians(c1.getLongitude())
-            );
+            float azimuth = Calculation.getAngle(testLocationLat, testLocationLong, c1.getLatitude(), c1.getLongitude());
             ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) loc_1.getLayoutParams();
             assertEquals(layoutParams.circleAngle, azimuth, 0);
 
