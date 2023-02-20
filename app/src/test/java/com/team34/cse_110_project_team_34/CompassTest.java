@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
+import utilities.Calculation;
 import utilities.Coordinate;
 import utilities.CoordinateDao;
 import utilities.Database;
@@ -96,7 +97,7 @@ public class CompassTest {
 
             activity.updatePerimeter();
 
-            float azimuth = activity.getAngle(
+            float azimuth = Calculation.getAngle(
                     Math.toRadians(testLocationLat),
                     Math.toRadians(testLocationLong),
                     Math.toRadians(c1.getLatitude()),
