@@ -1,6 +1,7 @@
 package com.team34.cse_110_project_team_34;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.MutableLiveData;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import utilities.Coordinate;
 import utilities.CoordinateDao;
 import utilities.Database;
+import utilities.OrientationService;
 
 public class AddActivity extends AppCompatActivity {
     private CoordinateDao coordinateDao;
@@ -96,10 +98,18 @@ public class AddActivity extends AppCompatActivity {
         }
     }
 
+    public void onSet(View view) {
+        EditText orientationBox = findViewById(R.id.editTextOrientation);
+        float value = Float.parseFloat(orientationBox.getText().toString());
+
+        MutableLiveData<Float> newOrientation = new MutableLiveData<Float>();
+        newOrientation.setValue((float) Math.toRadians(value));
+        OrientationService.getInstance(this).setMockOrientationSource(newOrientation);
+    }
+
     @Override
     protected void onDestroy() {
         Database.getInstance(this).close();
         super.onDestroy();
     }
-
 }
