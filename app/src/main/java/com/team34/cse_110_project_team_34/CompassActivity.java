@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import utilities.Calculation;
 import utilities.Coordinate;
 import utilities.CoordinateDao;
 import utilities.Database;
@@ -86,7 +87,7 @@ public class CompassActivity extends AppCompatActivity {
             location_view.setText(location.getLabel());
 
             ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) location_view.getLayoutParams();
-            float azimuth = getAngle(Math.toRadians(lastUserLat), Math.toRadians(lastUserLong), Math.toRadians(location.latitude), Math.toRadians(location.longitude));
+            float azimuth = Calculation.getAngle(lastUserLat, lastUserLong, location.latitude, location.longitude);
             layoutParams.circleAngle = compass.getRotation() + azimuth;
             location_view.setLayoutParams(layoutParams);
 
@@ -96,7 +97,7 @@ public class CompassActivity extends AppCompatActivity {
 
     public void observeOrientation() {
         orientationService.getOrientation().observe(this, orientation -> {
-            float newOrientation = 360 - (float) Math.toDegrees(orientation);
+            float newOrientation = Calculation.getCompassRotation(orientation);
             if (Math.abs(compass.getRotation() - newOrientation) % 360 >= 1) {
                 compass.setRotation(newOrientation);
             }
@@ -111,17 +112,6 @@ public class CompassActivity extends AppCompatActivity {
             updatePerimeter();
         });
     }
-
-    public float getAngle(double lat1, double long1, double lat2, double long2) {
-        double dLong = (long2 - long1);
-
-        double y = Math.sin(dLong) * Math.cos(lat2);
-        double x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLong);
-        double angle = Math.atan2(y, x);
-
-        return (float) (Math.toDegrees(angle) + 360) % 360;
-    }
-
 
     public void onAdd(View view) {
         Intent intent = new Intent(this, AddActivity.class);
