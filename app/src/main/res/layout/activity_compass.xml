@@ -30,6 +30,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:textSize="15sp"
+            android:textColor="@color/design_default_color_primary"
             app:layout_constraintCircle="@+id/clock"
             tools:layout_editor_absoluteX="50dp"
             tools:layout_editor_absoluteY="-2dp" />
