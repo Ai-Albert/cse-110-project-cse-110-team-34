@@ -32,7 +32,6 @@ public class CompassActivity extends AppCompatActivity {
     private List<Coordinate> locations;
     final int[] location_ids = {R.id.location_1, R.id.location_2, R.id.location_3};
 
-    private double lastOrientation;
     private double lastUserLat;
     private double lastUserLong;
 
@@ -56,7 +55,6 @@ public class CompassActivity extends AppCompatActivity {
 
         compass = findViewById(R.id.compass);
 
-        lastOrientation = 0;
         lastUserLat = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().first : 0;
         lastUserLong = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().second : 0;
 
@@ -86,6 +84,7 @@ public class CompassActivity extends AppCompatActivity {
             TextView location_view = findViewById(location_ids[location_number]);
             location_view.setVisibility(View.VISIBLE);
             location_view.setText(location.getLabel());
+
             ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) location_view.getLayoutParams();
             float azimuth = getAngle(Math.toRadians(lastUserLat), Math.toRadians(lastUserLong), Math.toRadians(location.latitude), Math.toRadians(location.longitude));
             layoutParams.circleAngle = compass.getRotation() + azimuth;
@@ -100,7 +99,6 @@ public class CompassActivity extends AppCompatActivity {
             float newOrientation = 360 - (float) Math.toDegrees(orientation);
             if (Math.abs(compass.getRotation() - newOrientation) % 360 >= 1) {
                 compass.setRotation(newOrientation);
-                lastOrientation = newOrientation;
             }
             updatePerimeter();
         });
