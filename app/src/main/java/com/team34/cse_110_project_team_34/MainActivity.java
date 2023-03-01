@@ -20,19 +20,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Remove this during demo
+        Database.getInstance(this).clearAllTables();
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
         ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
         }
 
-        CoordinateDao coordinateDao = Database.getInstance(this).getCoordinateDao();
-        if (coordinateDao.getAll().size() == 0) {
-            Intent intent = new Intent(this, AddActivity.class);
-            startActivity(intent);
-        }
-        else {
-            Intent intent = new Intent(this, CompassActivity.class);
-            startActivity(intent);
-        }
+        Intent intent = new Intent(this, NewUserActivity.class);
+        startActivity(intent);
     }
 }

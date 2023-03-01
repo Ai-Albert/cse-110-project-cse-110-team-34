@@ -13,36 +13,22 @@ public class Coordinate {
     @PrimaryKey
     public long id;
 
-    @ColumnInfo(name = "label")
-    public String label;
-
     @ColumnInfo(name = "longitude")
     public double longitude;
 
     @ColumnInfo(name = "latitude")
     public double latitude;
 
-    public Coordinate(String label, double latitude, double longitude) {
+    public Coordinate(double latitude, double longitude) {
         this.id = nextId;
-        this.label = label;
         this.longitude = longitude;
         this.latitude = latitude;
         nextId++;
     }
 
     public boolean equals(Coordinate c) {
-        return this.id == c.id &&
-                this.label.equals(c.label) &&
-                this.longitude == c.longitude &&
+        return this.longitude == c.longitude &&
                 this.latitude == c.latitude;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 
     public double getLongitude() {
