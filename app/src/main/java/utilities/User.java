@@ -24,6 +24,8 @@ public class User {
     @ColumnInfo(name = "UID")
     public String uid;
 
+
+
     public User(String name, double longitude, double latitude) {
         this.id = nextId;
         this.name = name;
