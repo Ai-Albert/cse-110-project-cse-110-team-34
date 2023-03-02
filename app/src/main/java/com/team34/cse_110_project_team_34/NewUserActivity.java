@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
-import utilities.CoordinateDao;
 import utilities.Database;
 import utilities.User;
 import utilities.UserDao;
