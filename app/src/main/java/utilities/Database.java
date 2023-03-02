@@ -5,7 +5,11 @@ import android.content.Context;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
+<<<<<<< Updated upstream
 @androidx.room.Database(entities = {Coordinate.class}, version = 1)
+=======
+@androidx.room.Database(entities = {User.class}, version = 1)
+>>>>>>> Stashed changes
 public abstract class Database extends RoomDatabase {
 
     private static Database instance = null;

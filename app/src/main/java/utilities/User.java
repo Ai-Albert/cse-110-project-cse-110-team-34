@@ -1,5 +1,6 @@
 package utilities;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -7,10 +8,10 @@ import androidx.room.PrimaryKey;
 
 @Entity
 public class User {
-    private static int nextId = 0;
 
+    @NonNull
     @PrimaryKey
-    public long id;
+    public String uid;
 
     @ColumnInfo(name = "name")
     public String name;
@@ -21,16 +22,12 @@ public class User {
     @ColumnInfo(name = "latitude")
     public double latitude;
 
-    @ColumnInfo(name = "UID")
-    public String uid;
 
     public User(String name, double longitude, double latitude) {
-        this.id = nextId;
         this.name = name;
         this.longitude = longitude;
         this.latitude = latitude;
         this.uid = Calculation.getRandomUID(10);
-        nextId++;
     }
 
     public boolean equals(User user) {
