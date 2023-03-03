@@ -16,7 +16,7 @@ public class Calculation {
 
         return (float) degsFromN;
     }
-    
+
     public static String getRandomUID(int length) {
         int leftLimit = 48; // numeral '0'
         int rightLimit = 122; // letter 'z'
