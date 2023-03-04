@@ -1,6 +1,7 @@
 package model;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -20,11 +21,11 @@ public class User {
 
     @NonNull
     @PrimaryKey
+    @SerializedName("public_code")
+    public String public_code;
+
     @SerializedName("private_code")
     public String private_uid;
-
-    @SerializedName("public_code")
-    public String uid;
 
     @SerializedName("label")
     public String name;
@@ -42,21 +43,25 @@ public class User {
     @ColumnInfo(name = "is_main")
     public boolean is_main;
 
-    public User(String name, double longitude, double latitude, boolean is_main) {
+    public User(String name, String public_code, double longitude, double latitude, boolean is_main) {
         this.name = name;
         this.longitude = longitude;
         this.latitude = latitude;
-        this.uid = UUID.randomUUID().toString();
+        this.public_code = public_code;
         this.is_main = is_main;
         this.private_uid = UUID.randomUUID().toString();
     }
 
     public boolean equals(User user) {
-        return this.uid == user.uid;
+        return this.getUid() == user.getUid();
     }
 
     public String getName() {
         return name;
+    }
+
+    public String getUid() {
+        return public_code;
     }
 
     public double getLongitude() {

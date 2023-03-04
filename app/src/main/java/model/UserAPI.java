@@ -1,6 +1,7 @@
 package model;
 
 import android.os.StrictMode;
+import android.util.Log;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -42,7 +43,8 @@ public class UserAPI {
             assert response.body() != null;
 
             String body = response.body().string();
-            if (body.equals("{\"detail\":\"User not found.\"}")) {
+            Log.d("test", body);
+            if (body.equals("{\"detail\":\"Location not found.\"}")) {
                 return null;
             }
             return User.fromJSON(body);

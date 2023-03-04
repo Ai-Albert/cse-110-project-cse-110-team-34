@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import java.util.UUID;
+
 import model.Database;
 import model.User;
 import model.UserDao;
@@ -28,8 +30,8 @@ public class NewUserActivity extends AppCompatActivity {
     }
 
     public void onSubmit(View view) {
-        User new_user = new User(name.getText().toString(), 0, 0, true);
-        repo.upsertSynced(new_user);
+        User new_user = new User(name.getText().toString(), UUID.randomUUID().toString(), 0, 0, true);
+        repo.upsertLocal(new_user);
 
         Intent intent = new Intent(this, NewFriendActivity.class);
         startActivity(intent);
