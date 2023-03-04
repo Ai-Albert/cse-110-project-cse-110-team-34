@@ -1,6 +1,7 @@
 package model;
 
 import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -38,11 +39,15 @@ public class User {
     @SerializedName("updated_at")
     public long version = 0;
 
-    public User(String name, double longitude, double latitude) {
+    @ColumnInfo(name = "is_main")
+    public boolean is_main;
+
+    public User(String name, double longitude, double latitude, boolean is_main) {
         this.name = name;
         this.longitude = longitude;
         this.latitude = latitude;
         this.uid = UUID.randomUUID().toString();
+        this.is_main = is_main;
         this.private_uid = UUID.randomUUID().toString();
     }
 

@@ -2,6 +2,7 @@ package com.team34.cse_110_project_team_34;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -27,7 +28,10 @@ public class NewUserActivity extends AppCompatActivity {
     }
 
     public void onSubmit(View view) {
-        User new_user = new User(name.getText().toString(), 0, 0);
-        repo.upsertLocal(new_user); // not testing remote yet because not needed
+        User new_user = new User(name.getText().toString(), 0, 0, true);
+        repo.upsertSynced(new_user);
+
+        Intent intent = new Intent(this, NewFriendActivity.class);
+        startActivity(intent);
     }
 }
