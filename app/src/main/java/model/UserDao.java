@@ -22,7 +22,7 @@ public interface UserDao {
     @Query("SELECT * FROM User WHERE name = :name")
     public abstract LiveData<User> get(String name);
 
-    @Query("SELECT 1 FROM User WHERE is_main = 1")
+    @Query("SELECT * FROM User WHERE is_main = 1")
     public abstract LiveData<User> getMain();
 
     @Query("SELECT * FROM User ORDER BY name")
