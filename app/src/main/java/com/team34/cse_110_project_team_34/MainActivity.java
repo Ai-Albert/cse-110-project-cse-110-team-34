@@ -10,15 +10,18 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import model.Database;
+import model.UserDao;
 
 public class MainActivity extends AppCompatActivity {
 
+    private UserDao dao;
     @SuppressLint("WrongThread")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        dao = Database.getInstance(this).getUserDao();
         // Remove this during demo
         Database.getInstance(this).clearAllTables();
 
@@ -27,7 +30,12 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
         }
 
-        Intent intent = new Intent(this, NewUserActivity.class);
-        startActivity(intent);
+        if (!dao.existsMain()) {
+            Intent intent = new Intent(this, NewUserActivity.class);
+            startActivity(intent);
+        } else {
+            Intent intent = new Intent(this, NewFriendActivity.class);
+            startActivity(intent);
+        }
     }
 }
