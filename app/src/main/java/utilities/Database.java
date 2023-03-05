@@ -6,6 +6,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
 @androidx.room.Database(entities = {Coordinate.class}, version = 1)
+
 public abstract class Database extends RoomDatabase {
 
     private static Database instance = null;
