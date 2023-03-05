@@ -41,6 +41,5 @@ public class NewFriendActivity extends AppCompatActivity {
             return;
         }
         last_added.setText(getString(R.string.added));
-
     }
 }

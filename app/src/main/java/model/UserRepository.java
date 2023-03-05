@@ -68,7 +68,6 @@ public class UserRepository {
     public void upsertLocal(User user) {
         user.version = Instant.now().getEpochSecond();
         dao.upsert(user);
-        Log.d("test", user.getUid() + user.getName());
     }
 
     public void deleteLocal(User user) {
