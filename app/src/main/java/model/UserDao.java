@@ -15,7 +15,6 @@ public interface UserDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM User WHERE name = :name)")
     public abstract boolean exists(String name);
-
     @Query("SELECT EXISTS(SELECT 1 FROM User WHERE is_main = 1)")
     public abstract boolean existsMain();
 
