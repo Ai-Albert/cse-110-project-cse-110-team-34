@@ -38,6 +38,10 @@ public class NewUserActivity extends AppCompatActivity {
      * Creates a new user in the remote database and locally given a name
      **/
     public void onSubmit(View view) {
+        if (name.getText().toString().equals("")) {
+            name.setError("User must have a name.");
+            return;
+        }
         String public_code = UUID.randomUUID().toString();
         String private_code = UUID.randomUUID().toString();
         User new_user = new User(name.getText().toString(), public_code, 0, 0);
