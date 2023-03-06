@@ -97,6 +97,13 @@ public class CompassActivity extends AppCompatActivity {
         Intent intent = new Intent(this, NewFriendActivity.class);
         startActivity(intent);
     }
+
+    public void onZoomIn(View view) {
+        if (radius >= 10) {
+            radius -= 5;
+            updateFriendLocations();
+        }
+    }
     
     public void onZoomOut(View view) {
         this.radius += 5;
