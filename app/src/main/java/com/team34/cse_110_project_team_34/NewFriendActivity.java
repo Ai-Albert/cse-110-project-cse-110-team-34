@@ -20,7 +20,6 @@ public class NewFriendActivity extends AppCompatActivity {
     private TextView last_added;
     private UserRepository repo;
 
-    private User main_user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +29,11 @@ public class NewFriendActivity extends AppCompatActivity {
         UserDao dao = Database.getInstance(this).getUserDao();
         repo = new UserRepository(dao);
         last_added = findViewById(R.id.last_added);
-        main_user = dao.getMain();
     }
 
+    /**
+     * Gets the friend's data and stores it into the database, given a valid friend code.
+     **/
     public void onSubmit(View view) {
         String uid = public_code.getText().toString();
         repo.getSynced(uid);

@@ -33,6 +33,10 @@ public class UserRepository {
         liveContent.addSource(realLiveContent, liveContent::postValue);
     }
 
+    /**
+     * Gets the latest data from either the local database or remotely, whichever was
+     * more recently updated.
+     **/
     public LiveData<User> getSynced(String public_code) {
         MediatorLiveData<User> user = new MediatorLiveData<User>();
 
@@ -52,9 +56,9 @@ public class UserRepository {
         return user;
     }
 
-    public void upsertSynced(User user) {
+    public void upsertSynced(String private_code, User user) {
         upsertLocal(user);
-        upsertRemote(user);
+        upsertRemote(private_code, user);
     }
 
     public LiveData<User> getLocal(String public_code) {
@@ -78,6 +82,9 @@ public class UserRepository {
         return dao.exists(name);
     }
 
+    /**
+     * Gets the latest data from the API, if it exists.
+     **/
     public LiveData<User> getRemote(String public_code) {
         if (clockFuture != null) {
             clockFuture.cancel(true);
@@ -97,7 +104,7 @@ public class UserRepository {
         return liveContent;
     }
 
-    public void upsertRemote(User user) {
-        api.put(user.getUid(), user);
+    public void upsertRemote(String private_code, User user) {
+        api.put(private_code, user);
     }
 }
