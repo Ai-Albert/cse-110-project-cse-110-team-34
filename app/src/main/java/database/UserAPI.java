@@ -1,7 +1,8 @@
-package model;
+package database;
 
 import android.os.StrictMode;
 
+import model.User;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

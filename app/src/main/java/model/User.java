@@ -52,7 +52,7 @@ public class User {
     }
 
     public boolean equals(User user) {
-        return this.uid == user.uid;
+        return this.uid.equals(user.uid);
     }
 
     public String getName() {

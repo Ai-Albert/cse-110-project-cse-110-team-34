@@ -4,14 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
-import model.Database;
+import database.Database;
 import model.User;
-import model.UserDao;
-import model.UserRepository;
+import database.UserDao;
+import database.UserRepository;
 
 public class NewUserActivity extends AppCompatActivity {
 
@@ -31,7 +30,7 @@ public class NewUserActivity extends AppCompatActivity {
         User new_user = new User(name.getText().toString(), 0, 0, true);
         repo.upsertSynced(new_user);
 
-        Intent intent = new Intent(this, NewFriendActivity.class);
+        Intent intent = new Intent(this, CompassActivity.class);
         startActivity(intent);
     }
 }
