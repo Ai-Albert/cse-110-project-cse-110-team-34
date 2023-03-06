@@ -1,19 +1,12 @@
 package com.team34.cse_110_project_team_34;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
-import androidx.core.util.Pair;
-import androidx.lifecycle.LiveData;
 
 import android.content.Intent;
 import android.content.res.Resources;
-import android.location.GpsStatus;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import java.util.List;
 
@@ -37,6 +30,7 @@ public class CompassActivity extends AppCompatActivity {
 
     private ImageView compass;
 
+    // screen width/height used for UI element layout
     public static int getScreenWidth() {
         return Resources.getSystem().getDisplayMetrics().widthPixels;
     }
@@ -72,7 +66,7 @@ public class CompassActivity extends AppCompatActivity {
     }
 
     public void updateFriendLocations() {
-        //
+        // TODO: use last fetched friend users lat/long to calculate radius and angle for compass placement
     }
 
     public void observeOrientation() {
@@ -85,10 +79,15 @@ public class CompassActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * @ensure remote DB is updated with lastMainLat and lastMainLong
+     * @ensure friend locations on compass are updated according to new location with existing radius
+     */
     public void observeLocation() {
         locationService.getLocation().observe(this, location -> {
             lastMainLat = location.first;
             lastMainLong = location.second;
+            // TODO: update main user's location in remote DB
             updateFriendLocations();
         });
     }
@@ -98,13 +97,22 @@ public class CompassActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * @require radius > 5
+     * @ensure radius = radius@pre - 5
+     * @ensure friend locations on compass are updated according to new radius
+     */
     public void onZoomIn(View view) {
-        if (radius >= 10) {
+        if (radius > 5) {
             radius -= 5;
             updateFriendLocations();
         }
     }
-    
+
+    /**
+     * @ensure radius = radius@pre + 5
+     * @ensure friend locations on compass are updated according to new radius
+     */
     public void onZoomOut(View view) {
         this.radius += 5;
         updateFriendLocations();
