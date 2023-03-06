@@ -21,7 +21,6 @@ import database.Database;
 import database.UserDao;
 import model.User;
 import utilities.Calculation;
-import utilities.Coordinate;
 import utilities.LocationService;
 import utilities.OrientationService;
 
@@ -34,6 +33,7 @@ public class CompassActivity extends AppCompatActivity {
     private double lastMainLat;
     private double lastMainLong;
     private List<User> friends;
+    private double radius; // Miles
 
     private ImageView compass;
 
@@ -44,6 +44,7 @@ public class CompassActivity extends AppCompatActivity {
     public static int getScreenHeight() {
         return Resources.getSystem().getDisplayMetrics().heightPixels;
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +55,7 @@ public class CompassActivity extends AppCompatActivity {
         locationService = LocationService.getInstance(this);
 
         compass = findViewById(R.id.compass);
+        radius = 50;
 
         lastMainLat = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().first : 0;
         lastMainLong = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().second : 0;
@@ -69,7 +71,7 @@ public class CompassActivity extends AppCompatActivity {
         locationService.unregisterLocationListener();
     }
 
-    public void updatePerimeter() {
+    public void updateFriendLocations() {
         //
     }
 
@@ -79,7 +81,7 @@ public class CompassActivity extends AppCompatActivity {
             if (Math.abs(compass.getRotation() - newOrientation) % 360 >= 1) {
                 compass.setRotation(newOrientation);
             }
-            updatePerimeter();
+            updateFriendLocations();
         });
     }
 
@@ -87,7 +89,7 @@ public class CompassActivity extends AppCompatActivity {
         locationService.getLocation().observe(this, location -> {
             lastMainLat = location.first;
             lastMainLong = location.second;
-            updatePerimeter();
+            updateFriendLocations();
         });
     }
 
