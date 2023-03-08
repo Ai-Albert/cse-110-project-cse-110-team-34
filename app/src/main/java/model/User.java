@@ -1,62 +1,64 @@
 package model;
 
 import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
+
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import java.time.Instant;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.TypeAdapter;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
-import java.util.UUID;
-
-@Entity
+@Entity(indices = {@Index(value = {"public_code"}, unique = true)})
 public class User {
 
+    /** The UID shared by the user to their friends. Used as the primary key everywhere. **/
     @NonNull
     @PrimaryKey
-    @SerializedName("private_code")
-    public String private_uid;
-
     @SerializedName("public_code")
-    public String uid;
+    public String public_code;
 
+    /** The name of the user. **/
     @SerializedName("label")
     public String name;
 
+    /** Represents the location of the user. **/
     @SerializedName("longitude")
     public double longitude;
 
     @SerializedName("latitude")
     public double latitude;
 
+    /** The last time the user's location was updated. **/
+
     @JsonAdapter(TimestampAdapter.class)
     @SerializedName("updated_at")
     public long version = 0;
 
-    @ColumnInfo(name = "is_main")
-    public boolean is_main;
-
-    public User(String name, double longitude, double latitude, boolean is_main) {
+    /** Constructor of a user. **/
+    public User(String name, String public_code, double longitude, double latitude) {
         this.name = name;
         this.longitude = longitude;
         this.latitude = latitude;
-        this.uid = UUID.randomUUID().toString();
-        this.is_main = is_main;
-        this.private_uid = UUID.randomUUID().toString();
+        this.public_code = public_code;
     }
 
     public boolean equals(User user) {
-        return this.uid == user.uid;
+        return this.getUid() == user.getUid();
     }
 
     public String getName() {
         return name;
+    }
+
+    public String getUid() {
+        return public_code;
     }
 
     public double getLongitude() {
@@ -79,12 +81,28 @@ public class User {
         return new Gson().fromJson(json, User.class);
     }
 
-    public String toJSON() {
-        return new Gson().toJson(this);
+    /** Creates the JSON body and removes fields to be compliant with the API for put. **/
+    public String toPutJSON(String private_code) {
+        JsonObject json = (JsonObject) new Gson().toJsonTree(this);
+        json.remove("public_code");
+        json.remove("updated_at");
+        json.addProperty("private_code", private_code);
+        return json.toString();
+    }
+
+    /** Creates the JSON body and removes fields to be compliant with the API for patch. **/
+    public String toPatchJSON(String private_code) {
+        JsonObject json = (JsonObject) new Gson().toJsonTree(this);
+        json.remove("public_code");
+        json.remove("updated_at");
+        json.remove("label");
+        json.addProperty("private_code", private_code);
+        return json.toString();
     }
 }
 
 
+/** Adapter for converting between dates on the API into longs. **/
 class TimestampAdapter extends TypeAdapter<Long> {
     @Override
     public void write(JsonWriter out, Long value) throws java.io.IOException {

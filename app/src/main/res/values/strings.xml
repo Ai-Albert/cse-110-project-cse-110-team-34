@@ -7,4 +7,5 @@
     <string name="back">Back</string>
     <string name="set">Set</string>
     <string name="friend_id">friend_id</string>
+    <string name="added">\"Successfully added \"</string>
 </resources>

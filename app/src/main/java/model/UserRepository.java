@@ -1,5 +1,7 @@
 package model;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -31,7 +33,11 @@ public class UserRepository {
         liveContent.addSource(realLiveContent, liveContent::postValue);
     }
 
-    public LiveData<User> getSynced(String name) {
+    /**
+     * Gets the latest data from either the local database or remotely, whichever was
+     * more recently updated.
+     **/
+    public LiveData<User> getSynced(String public_code) {
         MediatorLiveData<User> user = new MediatorLiveData<User>();
 
         Observer<User> updateFromRemote = theirUser -> {
@@ -43,20 +49,20 @@ public class UserRepository {
         };
 
         // If we get a local update, pass it on.
-        user.addSource(getLocal(name), user::postValue);
+        user.addSource(getLocal(public_code), user::postValue);
         // If we get a remote update, update the local version (triggering the above observer)
-        user.addSource(getRemote(name), updateFromRemote);
+        user.addSource(getRemote(public_code), updateFromRemote);
 
         return user;
     }
 
-    public void upsertSynced(User user) {
+    public void upsertSynced(String private_code, User user) {
         upsertLocal(user);
-        upsertRemote(user);
+        upsertRemote(private_code, user);
     }
 
-    public LiveData<User> getLocal(String name) {
-        return dao.get(name);
+    public LiveData<User> getLocal(String public_code) {
+        return dao.get(public_code);
     }
 
     public LiveData<List<User>> getAllLocal() {
@@ -76,17 +82,21 @@ public class UserRepository {
         return dao.exists(name);
     }
 
-    public LiveData<User> getRemote(String name) {
+    /**
+     * Gets the latest data from the API, if it exists.
+     **/
+    public LiveData<User> getRemote(String public_code) {
         if (clockFuture != null) {
             clockFuture.cancel(true);
         }
-        User user = api.get(name);
+        User user = api.get(public_code);
+
         if (user != null) {
-            upsertSynced(user);
+            upsertLocal(user);
         }
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         clockFuture = executor.scheduleAtFixedRate(() -> {
-            User temp = api.get(name);
+            User temp = api.get(public_code);
             if (temp != null) {
                 realLiveContent.postValue(temp);
             }
@@ -94,7 +104,7 @@ public class UserRepository {
         return liveContent;
     }
 
-    public void upsertRemote(User user) {
-        api.put(user.uid, user);
+    public void upsertRemote(String private_code, User user) {
+        api.put(private_code, user);
     }
 }
