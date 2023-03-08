@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -30,13 +31,14 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
         }
-
-        if (!dao.existsMain()) {
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        if (preferences.contains("Private")) {
             Intent intent = new Intent(this, NewUserActivity.class);
             startActivity(intent);
         } else {
             Intent intent = new Intent(this, CompassActivity.class);
             startActivity(intent);
         }
+
     }
 }

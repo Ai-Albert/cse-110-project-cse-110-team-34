@@ -19,7 +19,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
     <Button
-        android:id="@+id/submit"
+        android:id="@+id/submit_new_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="75dp"

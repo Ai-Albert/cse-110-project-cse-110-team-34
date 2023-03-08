@@ -11,4 +11,5 @@
     <string name="compass">compass</string>
     <string name="zoom_out">Zoom Out</string>
     <string name="zoom_in">Zoom In</string>
+    <string name="added">\"Successfully added \"</string>
 </resources>

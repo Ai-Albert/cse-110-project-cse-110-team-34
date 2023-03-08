@@ -1,6 +1,12 @@
 package database;
 
+import android.content.SharedPreferences;
 import android.os.StrictMode;
+import android.util.Log;
+
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import model.User;
 import okhttp3.MediaType;
@@ -21,6 +27,7 @@ public class UserAPI {
         StrictMode.setThreadPolicy(policy);
     }
 
+
     public static UserAPI provide() {
 
         if (instance == null) {
@@ -29,7 +36,11 @@ public class UserAPI {
         return instance;
     }
 
-
+    /**
+     * Sends a GET request to the server.
+     * @param public_code - Public UID of the user.
+     * @return a User object, if the public code is found.
+     */
     public User get(String public_code) {
         // URLs cannot contain spaces, so we replace them with %20.
         public_code = public_code.replace(" ", "%20");
@@ -43,7 +54,7 @@ public class UserAPI {
             assert response.body() != null;
 
             String body = response.body().string();
-            if (body.equals("{\"detail\":\"User not found.\"}")) {
+            if (body.equals("{\"detail\":\"Location not found.\"}")) {
                 return null;
             }
             return User.fromJSON(body);
@@ -54,10 +65,40 @@ public class UserAPI {
         return null;
     }
 
-    public void put(String public_code, User user) {
+    /**
+     * Sends a PUT request to the server.
+     * @param private_code - Private password of the user.
+     * @param user - The user to be updated
+     */
+    public void put(String private_code, User user) {
         // URLs cannot contain spaces, so we replace them with %20.
+        String public_code = user.getUid();
         public_code = public_code.replace(" ", "%20");
-        RequestBody requestBody = RequestBody.create(user.toJSON(), JSON);
+        RequestBody requestBody = RequestBody.create(user.toPutJSON(private_code), JSON);
+        Request request = new Request.Builder()
+                .url("https://socialcompass.goto.ucsd.edu/location/" + public_code)
+                .method("PUT", requestBody)
+                .build();
+
+        try (okhttp3.Response response = client.newCall(request).execute()) {
+            assert response.body() != null;
+            String body = response.body().string();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Sends a PATCH request to the server.
+     * @param private_code - Private password of the user.
+     * @param user - The user to be updated
+     */
+    public void patch(String private_code, User user) {
+        // URLs cannot contain spaces, so we replace them with %20.
+        String public_code = user.getUid();
+        public_code = public_code.replace(" ", "%20");
+        RequestBody requestBody = RequestBody.create(user.toPatchJSON(private_code), JSON);
         Request request = new Request.Builder()
                 .url("https://socialcompass.goto.ucsd.edu/location/" + public_code)
                 .method("PUT", requestBody)
