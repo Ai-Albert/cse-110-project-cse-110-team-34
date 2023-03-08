@@ -3,6 +3,7 @@ package model;
 import androidx.annotation.NonNull;
 
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import java.time.Instant;
@@ -14,7 +15,9 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
-@Entity
+
+@Entity(indices = {@Index(value = {"public_code"}, unique = true)})
+
 public class User {
 
     /** The UID shared by the user to their friends. Used as the primary key everywhere. **/
