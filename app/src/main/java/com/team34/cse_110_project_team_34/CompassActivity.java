@@ -1,5 +1,6 @@
 package com.team34.cse_110_project_team_34;
 
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -26,7 +27,9 @@ public class CompassActivity extends AppCompatActivity {
     private double lastMainLat;
     private double lastMainLong;
     private List<User> friends;
-    private double radius; // Miles
+
+    @VisibleForTesting
+    public double radius; // Miles
 
     private ImageView compass;
 
