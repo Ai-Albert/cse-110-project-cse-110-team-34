@@ -1,6 +1,4 @@
-package model;
-
-import android.util.Log;
+package database;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
@@ -13,6 +11,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import model.User;
 
 public class UserRepository {
     private final UserDao dao;

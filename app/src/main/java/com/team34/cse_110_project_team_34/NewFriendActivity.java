@@ -1,18 +1,15 @@
 package com.team34.cse_110_project_team_34;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import model.Database;
-import model.User;
-import model.UserDao;
-import model.UserRepository;
+import database.Database;
+import database.UserDao;
+import database.UserRepository;
 
 public class NewFriendActivity extends AppCompatActivity {
 

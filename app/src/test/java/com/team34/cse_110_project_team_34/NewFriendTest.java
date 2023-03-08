@@ -15,9 +15,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
-import model.Database;
-import model.UserDao;
-import model.UserRepository;
+import database.Database;
+import database.UserDao;
+import database.UserRepository;
 
 @RunWith(RobolectricTestRunner.class)
 public class NewFriendTest {

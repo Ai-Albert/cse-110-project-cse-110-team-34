@@ -6,18 +6,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
-
-import java.util.Map;
-import java.util.Set;
+import database.Database;
 import java.util.UUID;
-import model.Database;
 import model.User;
-import model.UserDao;
-import model.UserRepository;
+import database.UserDao;
+import database.UserRepository;
 
 public class NewUserActivity extends AppCompatActivity {
 
@@ -52,7 +48,7 @@ public class NewUserActivity extends AppCompatActivity {
         editor.apply();
         repo.upsertSynced(private_code, new_user);
 
-        Intent intent = new Intent(this, NewFriendActivity.class);
+        Intent intent = new Intent(this, CompassActivity.class);
         startActivity(intent);
     }
 }

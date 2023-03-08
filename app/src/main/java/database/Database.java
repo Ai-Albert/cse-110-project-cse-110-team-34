@@ -1,9 +1,12 @@
-package model;
+package database;
 
 import android.content.Context;
 
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+
+import model.User;
+
 @androidx.room.Database(entities = {User.class}, version = 2)
 
 public abstract class Database extends RoomDatabase {

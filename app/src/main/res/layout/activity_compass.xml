@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".CompassActivity">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clock"
         android:layout_width="0dp"
@@ -18,51 +19,52 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
         <ImageView
             android:id="@+id/compass"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:contentDescription="@string/compass"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
             app:srcCompat="@drawable/compass"
-            tools:layout_editor_absoluteX="0dp"
             tools:layout_editor_absoluteY="0dp" />
-        <TextView
-            android:id="@+id/location_1"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:textSize="15sp"
-            android:textColor="@color/design_default_color_primary"
-            app:layout_constraintCircle="@+id/clock"
-            tools:layout_editor_absoluteX="50dp"
-            tools:layout_editor_absoluteY="-2dp" />
-        <TextView
-            android:id="@+id/location_2"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:textSize="15sp"
-            app:layout_constraintCircle="@+id/clock"
-            tools:layout_editor_absoluteX="50dp"
-            tools:layout_editor_absoluteY="-2dp" />
-        <TextView
-            android:id="@+id/location_3"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:textSize="15sp"
-            app:layout_constraintCircle="@+id/clock"
-            tools:layout_editor_absoluteX="50dp"
-            tools:layout_editor_absoluteY="-2dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
         android:id="@+id/addButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Locations"
-        android:onClick="onAdd"
         android:layout_marginBottom="20dp"
+        android:onClick="onAdd"
+        android:text="@string/add_friends"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintVertical_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/zoomInButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="75dp"
+        android:onClick="onZoomIn"
+        android:text="@string/zoom_in"
+        app:layout_constraintBottom_toTopOf="@+id/addButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/clock" />
+
+    <Button
+        android:id="@+id/zoomOutButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="75dp"
+        android:onClick="onZoomOut"
+        android:text="@string/zoom_out"
+        app:layout_constraintBottom_toTopOf="@+id/addButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/clock"
+        app:layout_constraintVertical_bias="0.516" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,4 +1,4 @@
-package model;
+package database;
 
 import android.content.SharedPreferences;
 import android.os.StrictMode;
@@ -8,6 +8,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import model.User;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

@@ -1,4 +1,4 @@
-package model;
+package database;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -7,6 +7,8 @@ import androidx.room.Query;
 import androidx.room.Upsert;
 
 import java.util.List;
+
+import model.User;
 
 @Dao
 public interface UserDao {

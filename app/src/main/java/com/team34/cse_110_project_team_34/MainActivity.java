@@ -10,12 +10,13 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
-import model.Database;
-import model.UserDao;
+import database.Database;
+import database.UserDao;
 
 public class MainActivity extends AppCompatActivity {
 
     private UserDao dao;
+
     @SuppressLint("WrongThread")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,13 +32,12 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
         }
         SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-        if (preferences.contains("Private")) {
+        if (!preferences.contains("Private")) {
             Intent intent = new Intent(this, NewUserActivity.class);
             startActivity(intent);
         } else {
-            Intent intent = new Intent(this, NewFriendActivity.class);
+            Intent intent = new Intent(this, CompassActivity.class);
             startActivity(intent);
         }
-
     }
 }

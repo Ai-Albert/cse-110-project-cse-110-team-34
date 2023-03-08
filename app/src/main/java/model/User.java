@@ -51,7 +51,7 @@ public class User {
     }
 
     public boolean equals(User user) {
-        return this.getUid() == user.getUid();
+        return this.public_code.equals(user.public_code);
     }
 
     public String getName() {
