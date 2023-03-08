@@ -15,7 +15,6 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
-
 @Entity(indices = {@Index(value = {"public_code"}, unique = true)})
 
 public class User {
