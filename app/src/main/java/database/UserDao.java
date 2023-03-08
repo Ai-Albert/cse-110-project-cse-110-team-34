@@ -15,8 +15,8 @@ public interface UserDao {
     @Upsert
     public abstract long upsert(User user);
 
-    @Query("SELECT EXISTS(SELECT 1 FROM User WHERE name = :name)")
-    public abstract boolean exists(String name);
+    @Query("SELECT EXISTS(SELECT 1 FROM User WHERE public_code = :public_code)")
+    public abstract boolean exists(String public_code);
 
     @Query("SELECT * FROM User WHERE public_code = :public_code")
     public abstract LiveData<User> get(String public_code);

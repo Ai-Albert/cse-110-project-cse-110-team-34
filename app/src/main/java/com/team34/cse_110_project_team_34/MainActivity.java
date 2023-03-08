@@ -32,13 +32,12 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
         }
         SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-        if (preferences.contains("Private")) {
+        if (!preferences.contains("Private")) {
             Intent intent = new Intent(this, NewUserActivity.class);
             startActivity(intent);
         } else {
             Intent intent = new Intent(this, CompassActivity.class);
             startActivity(intent);
         }
-
     }
 }
