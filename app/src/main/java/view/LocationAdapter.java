@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.team34.cse_110_project_team_34.R;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,7 +40,11 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
 
         public void bind(User user) {
             nameView.setText(user.getName());
-            statusView.setImageResource(R.drawable.green_indicator);
+            if (user.getLastUpdated() + 60 >= Instant.now().getEpochSecond()) {
+                statusView.setImageResource(R.drawable.green_indicator);
+            } else {
+                statusView.setImageResource(R.drawable.red_indicator);
+            }
         }
     }
 
