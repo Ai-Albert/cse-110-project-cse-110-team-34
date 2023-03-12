@@ -1,8 +1,13 @@
 package com.team34.cse_110_project_team_34;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -12,15 +17,17 @@ import android.widget.ImageView;
 import java.util.List;
 
 import database.Database;
-import database.UserDao;
+import database.UserRepository;
 import model.User;
 import utilities.Calculation;
 import utilities.LocationService;
 import utilities.OrientationService;
+import view.LocationAdapter;
+import viewModel.LocationViewModel;
 
 public class CompassActivity extends AppCompatActivity {
 
-    private UserDao userDao;
+    private UserRepository userRepo;
     private OrientationService orientationService;
     private LocationService locationService;
 
@@ -32,6 +39,9 @@ public class CompassActivity extends AppCompatActivity {
     public double radius; // Miles
 
     private ImageView compass;
+
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    public RecyclerView recyclerView;
 
     // screen width/height used for UI element layout
     public static int getScreenWidth() {
@@ -47,7 +57,8 @@ public class CompassActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compass);
 
-        userDao = Database.getInstance(this).getUserDao();
+        userRepo = new UserRepository(Database.getInstance(this).getUserDao());
+
         orientationService = OrientationService.getInstance(this);
         locationService = LocationService.getInstance(this);
 
@@ -59,6 +70,34 @@ public class CompassActivity extends AppCompatActivity {
 
         observeLocation();
         observeOrientation();
+        LocationViewModel viewModel = setupViewModel();
+        LocationAdapter adapter = setupAdapter(viewModel);
+
+        setupViews(adapter);
+    }
+
+    private LocationViewModel setupViewModel() {
+        return new ViewModelProvider(this).get(LocationViewModel.class);
+    }
+
+    @NonNull
+    private LocationAdapter setupAdapter(LocationViewModel viewModel) {
+        LocationAdapter adapter = new LocationAdapter();
+        adapter.setHasStableIds(true);
+        viewModel.getUsers().observe(this, adapter::setUsers);
+        return adapter;
+    }
+
+    private void setupViews(LocationAdapter adapter) {
+        setupRecycler(adapter);
+    }
+
+    @SuppressLint("RestrictedApi")
+    private void setupRecycler(LocationAdapter adapter) {
+        // We store the recycler view in a field _only_ because we will want to access it in tests.
+        recyclerView = findViewById(R.id.recycler_main);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2 /* TODO: Figure out what number? */));
+        recyclerView.setAdapter(adapter);
     }
 
     @Override
@@ -70,6 +109,7 @@ public class CompassActivity extends AppCompatActivity {
 
     public void updateFriendLocations() {
         // TODO: use last fetched friend users lat/long to calculate radius and angle for compass placement
+
     }
 
     public void observeOrientation() {

@@ -1,6 +1,7 @@
 package com.team34.cse_110_project_team_34;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import database.Database;
 import database.UserDao;
 import database.UserRepository;
+import model.User;
 
 public class NewFriendActivity extends AppCompatActivity {
 

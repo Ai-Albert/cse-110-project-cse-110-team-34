@@ -78,8 +78,8 @@ public class UserRepository {
         dao.delete(user);
     }
 
-    public boolean existsLocal(String name) {
-        return dao.exists(name);
+    public boolean existsLocal(String public_code) {
+        return dao.exists(public_code);
     }
 
     /**
