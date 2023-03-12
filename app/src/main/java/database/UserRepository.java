@@ -70,7 +70,6 @@ public class UserRepository {
     }
 
     public void upsertLocal(User user) {
-        user.version = Instant.now().getEpochSecond();
         dao.upsert(user);
     }
 

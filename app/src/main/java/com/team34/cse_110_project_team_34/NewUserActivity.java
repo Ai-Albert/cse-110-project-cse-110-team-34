@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -46,7 +47,6 @@ public class NewUserActivity extends AppCompatActivity {
         editor.putString("Public", public_code);
         editor.apply();
         repo.upsertSynced(private_code, new_user);
-
         Intent intent = new Intent(this, CompassActivity.class);
         startActivity(intent);
     }

@@ -8,10 +8,10 @@
 
     <TextView
         android:id="@+id/location_name"
-        android:layout_width="50dp"
+        android:layout_width="0dp"
         android:layout_height="30dp"
         android:ellipsize="end"
-        android:hint="Title"
+        android:hint="Name"
         android:maxLines="1"
         android:textSize="24sp"
         android:textStyle="bold"
