@@ -2,6 +2,7 @@ package com.team34.cse_110_project_team_34;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -38,6 +39,15 @@ public class NewFriendActivity extends AppCompatActivity {
             public_code.setError("Invalid friend code.");
             return;
         }
-        last_added.setText(getString(R.string.added));
+        Intent intent = new Intent(this, CompassActivity.class);
+        startActivity(intent);
+    }
+
+    /**
+     * Goes back to compass view without adding a friend
+     **/
+    public void onBack(View view) {
+        Intent intent = new Intent(this, CompassActivity.class);
+        startActivity(intent);
     }
 }
