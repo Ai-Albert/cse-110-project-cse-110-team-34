@@ -19,6 +19,10 @@ import database.Database;
 import database.UserDao;
 import database.UserRepository;
 
+
+/**
+ * Tests for Story 6
+ */
 @RunWith(RobolectricTestRunner.class)
 public class NewFriendTest {
 
@@ -38,6 +42,9 @@ public class NewFriendTest {
         scenario.moveToState(Lifecycle.State.RESUMED);
     }
 
+    /**
+     * Tests for an invalid friend code (Within the definition of our code)
+     */
     @Test
     public void testAddInvalidUID() {
         scenario.onActivity(activity -> {
@@ -49,6 +56,9 @@ public class NewFriendTest {
         });
     }
 
+    /**
+     * Tests for an valid friend code on the remote repository
+     */
     @Test
     public void testAddValidID() {
         scenario.onActivity(activity -> {
