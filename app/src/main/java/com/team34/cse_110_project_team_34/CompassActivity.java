@@ -72,7 +72,7 @@ public class CompassActivity extends AppCompatActivity {
         locationService = LocationService.getInstance(this);
 
         compass = findViewById(R.id.compass);
-        radius = 50;
+        radius = 20;
 
         lastMainLat = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().first : 0;
         lastMainLong = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().second : 0;
@@ -161,8 +161,8 @@ public class CompassActivity extends AppCompatActivity {
      * @ensure friend locations on compass are updated according to new radius
      */
     public void onZoomIn(View view) {
-        if (radius > 5) {
-            radius -= 5;
+        if (radius >= 13) {
+            radius /= 1.5;
             updateFriendLocations();
         }
     }
@@ -172,7 +172,7 @@ public class CompassActivity extends AppCompatActivity {
      * @ensure friend locations on compass are updated according to new radius
      */
     public void onZoomOut(View view) {
-        this.radius += 5;
+        this.radius *= 1.5;
         updateFriendLocations();
     }
 }
