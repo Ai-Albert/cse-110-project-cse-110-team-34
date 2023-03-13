@@ -3,6 +3,7 @@ package com.team34.cse_110_project_team_34;
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -17,6 +18,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -179,10 +181,12 @@ public class CompassActivity extends AppCompatActivity {
     }
 
     public void addTextView(View view) {
-        RelativeLayout rl = new RelativeLayout(this);
+        ConstraintLayout ll = this.findViewById(R.id.mainLayout);
+
         TextView newText = new TextView(this);
         newText.setText("dynamically added a view wow!");
-        rl.addView(newText);
+        ll.addView(newText);
 
+        setContentView(ll);
     }
 }
