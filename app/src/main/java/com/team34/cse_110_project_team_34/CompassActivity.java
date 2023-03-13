@@ -91,7 +91,10 @@ public class CompassActivity extends AppCompatActivity {
 
     @NonNull
     private LocationAdapter setupAdapter(LocationViewModel viewModel) {
-        LocationAdapter adapter = new LocationAdapter();
+        SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
+        String public_uid = preferences.getString("Public", "null");
+
+        LocationAdapter adapter = new LocationAdapter(public_uid);
         adapter.setHasStableIds(true);
         viewModel.getUsers().observe(this, adapter::setUsers);
         return adapter;
@@ -119,7 +122,7 @@ public class CompassActivity extends AppCompatActivity {
 
     public void updateFriendLocations() {
         // TODO: use last fetched friend users lat/long to calculate radius and angle for compass placement
-        Log.d("update", preferences.getString("Private", ""));
+        //Log.d("update", preferences.getString("Private", ""));
 //        Log.d("Update", mainUser.getValue().toPatchJSON("aaa"));
 //        userRepo.upsertSynced(preferences.getString("Private", ""), mainUser.getValue());
     }

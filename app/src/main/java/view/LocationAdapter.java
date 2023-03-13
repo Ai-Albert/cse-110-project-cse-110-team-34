@@ -1,5 +1,6 @@
 package view;
 
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,11 @@ import model.User;
 
 public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
     private List<User> users = Collections.emptyList();
+    private String public_uid;
+
+    public LocationAdapter(String public_uid) {
+        this.public_uid = public_uid;
+    }
 
     /**
      * This time around, the ViewHolder is much simpler, just data.
@@ -50,6 +56,16 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
 
     public void setUsers(List<User> users) {
         this.users = users;
+
+        User curr = null;
+        for (User u : users) {
+            if (u.public_code.equals(public_uid)) {
+                curr = u;
+                break;
+            }
+        }
+        users.remove(curr);
+
         notifyDataSetChanged();
     }
 
