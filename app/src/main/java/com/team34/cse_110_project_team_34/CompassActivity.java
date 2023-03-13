@@ -17,6 +17,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -174,5 +176,13 @@ public class CompassActivity extends AppCompatActivity {
     public void onZoomOut(View view) {
         this.radius *= 1.5;
         updateFriendLocations();
+    }
+
+    public void addTextView(View view) {
+        RelativeLayout rl = new RelativeLayout(this);
+        TextView newText = new TextView(this);
+        newText.setText("dynamically added a view wow!");
+        rl.addView(newText);
+
     }
 }
