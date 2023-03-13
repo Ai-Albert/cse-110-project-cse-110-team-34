@@ -16,6 +16,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -30,7 +31,7 @@ import model.User;
 import utilities.Calculation;
 import utilities.LocationService;
 import utilities.OrientationService;
-import view.LocationAdapter;
+import view.LocationView;
 import viewModel.LocationViewModel;
 
 public class CompassActivity extends AppCompatActivity {
@@ -45,13 +46,14 @@ public class CompassActivity extends AppCompatActivity {
     private double lastMainLat;
     private double lastMainLong;
 
+    private LiveData<List<User>> users;
+    private List<LocationView> views;
+
     @VisibleForTesting
     public double radius; // Miles
 
     private ImageView compass;
 
-    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    public RecyclerView recyclerView;
 
     // screen width/height used for UI element layout
     public static int getScreenWidth() {
@@ -69,8 +71,14 @@ public class CompassActivity extends AppCompatActivity {
 
         userRepo = new UserRepository(Database.getInstance(this).getUserDao());
         preferences = getPreferences(MODE_PRIVATE);
-        Log.d("create", preferences.getString("Private", ""));
         mainUser = userRepo.getLocal(preferences.getString("Public", ""));
+        users = userRepo.getAllLocal();
+
+        ConstraintLayout ll = this.findViewById(R.id.constraint_main);
+        for (User user: users.getValue()) {
+            views.add(addLocationView(ll, user));
+        }
+        setContentView(ll);
 
         orientationService = OrientationService.getInstance(this);
         locationService = LocationService.getInstance(this);
@@ -83,38 +91,6 @@ public class CompassActivity extends AppCompatActivity {
 
         observeLocation();
         observeOrientation();
-        LocationViewModel viewModel = setupViewModel();
-        LocationAdapter adapter = setupAdapter(viewModel);
-
-        setupViews(adapter);
-    }
-
-    private LocationViewModel setupViewModel() {
-        return new ViewModelProvider(this).get(LocationViewModel.class);
-    }
-
-    @NonNull
-    private LocationAdapter setupAdapter(LocationViewModel viewModel) {
-        SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
-        String public_uid = preferences.getString("Public", "null");
-
-        LocationAdapter adapter = new LocationAdapter(public_uid);
-        adapter.setHasStableIds(true);
-        viewModel.getUsers().observe(this, adapter::setUsers);
-        return adapter;
-    }
-
-    private void setupViews(LocationAdapter adapter) {
-        setupRecycler(adapter);
-    }
-
-    @SuppressLint("RestrictedApi")
-    private void setupRecycler(LocationAdapter adapter) {
-        // We store the recycler view in a field _only_ because we will want to access it in tests.
-        recyclerView = findViewById(R.id.recycler_main);
-        // TODO: Make a custom layout manager
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
     }
 
     @Override
@@ -129,6 +105,10 @@ public class CompassActivity extends AppCompatActivity {
         //Log.d("update", preferences.getString("Private", ""));
 //        Log.d("Update", mainUser.getValue().toPatchJSON("aaa"));
 //        userRepo.upsertSynced(preferences.getString("Private", ""), mainUser.getValue());
+        List<User> currUsers = users.getValue();
+        for (int i = 0; i < currUsers.size(); i++) {
+            views.get(i).update(currUsers.get(i));
+        }
     }
 
     public void observeOrientation() {
@@ -180,13 +160,12 @@ public class CompassActivity extends AppCompatActivity {
         updateFriendLocations();
     }
 
-    public void addTextView(View view) {
-        ConstraintLayout ll = this.findViewById(R.id.mainLayout);
+    public LocationView addLocationView(ConstraintLayout ll, User user) {
+        View inflater = LayoutInflater.from(this)
+                .inflate(R.layout.location, ll, false);
 
-        TextView newText = new TextView(this);
-        newText.setText("dynamically added a view wow!");
-        ll.addView(newText);
+        LocationView userView = new LocationView(user, inflater);
 
-        setContentView(ll);
+        return userView;
     }
 }
