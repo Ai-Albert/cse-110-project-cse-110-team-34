@@ -1,11 +1,13 @@
 package com.team34.cse_110_project_team_34;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -18,8 +20,6 @@ import android.widget.TextView;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import database.Database;
 import database.UserRepository;
@@ -95,6 +95,7 @@ public class CompassActivity extends AppCompatActivity {
     private LocationViewModel setupViewModel() {
         return new ViewModelProvider(this).get(LocationViewModel.class);
     }
+
 
     @Override
     protected void onDestroy() {
