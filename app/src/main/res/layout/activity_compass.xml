@@ -37,8 +37,8 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="0dp"
-            app:layout_constraintDimensionRatio="1"
             app:layout_constraintBottom_toBottomOf="@+id/compass"
+            app:layout_constraintDimensionRatio="1"
             app:layout_constraintEnd_toEndOf="@+id/compass"
             app:layout_constraintStart_toStartOf="@+id/compass"
             app:layout_constraintTop_toTopOf="@+id/compass" />
@@ -79,5 +79,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/clock"
         app:layout_constraintVertical_bias="0.5" />
+
+    <TextView
+        android:id="@+id/public_uid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/clock"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

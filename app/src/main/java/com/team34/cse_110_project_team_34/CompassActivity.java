@@ -70,15 +70,18 @@ public class CompassActivity extends AppCompatActivity {
         setContentView(R.layout.activity_compass);
 
         userRepo = new UserRepository(Database.getInstance(this).getUserDao());
-        preferences = getPreferences(MODE_PRIVATE);
+        preferences = getSharedPreferences("preferences", MODE_PRIVATE);
         mainUser = userRepo.getLocal(preferences.getString("Public", ""));
         users = userRepo.getAllLocal();
 
         ConstraintLayout ll = this.findViewById(R.id.constraint_main);
-        for (User user: users.getValue()) {
-            views.add(addLocationView(ll, user));
-        }
-        setContentView(ll);
+//        for (User user: users.getValue()) {
+//            views.add(addLocationView(ll, user));
+//        }
+//        setContentView(ll);
+
+        TextView public_uid_text = this.findViewById(R.id.public_uid);
+        public_uid_text.setText("Public UID: " + preferences.getString("Public", ""));
 
         orientationService = OrientationService.getInstance(this);
         locationService = LocationService.getInstance(this);
@@ -105,10 +108,10 @@ public class CompassActivity extends AppCompatActivity {
         //Log.d("update", preferences.getString("Private", ""));
 //        Log.d("Update", mainUser.getValue().toPatchJSON("aaa"));
 //        userRepo.upsertSynced(preferences.getString("Private", ""), mainUser.getValue());
-        List<User> currUsers = users.getValue();
-        for (int i = 0; i < currUsers.size(); i++) {
-            views.get(i).update(currUsers.get(i));
-        }
+//        List<User> currUsers = users.getValue();
+//        for (int i = 0; i < currUsers.size(); i++) {
+//            views.get(i).update(currUsers.get(i));
+//        }
     }
 
     public void observeOrientation() {
