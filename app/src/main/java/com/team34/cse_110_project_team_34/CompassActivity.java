@@ -22,6 +22,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import database.Database;
+import database.UserDao;
 import database.UserRepository;
 import model.User;
 import utilities.Calculation;
@@ -65,11 +66,19 @@ public class CompassActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compass);
 
-        userRepo = new UserRepository(Database.getInstance(this).getUserDao());
+        UserDao dao = Database.getInstance(this).getUserDao();
+
+        SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
+        String link = preferences.getString("API_Link", "");
+        if (link.equals("")) {
+            userRepo = new UserRepository(dao);
+        } else {
+            userRepo = new UserRepository(dao, link);
+        }
+
         orientationService = OrientationService.getInstance(this);
         locationService = LocationService.getInstance(this);
 
-        SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
         main_public_uid = preferences.getString("Public", "");
         main_private_uid = preferences.getString("Private", "");
 

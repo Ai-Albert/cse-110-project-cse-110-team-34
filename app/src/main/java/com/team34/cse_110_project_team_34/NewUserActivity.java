@@ -18,6 +18,7 @@ import database.UserRepository;
 public class NewUserActivity extends AppCompatActivity {
 
     private EditText name;
+    private EditText api_link;
     private UserRepository repo;
 
     @Override
@@ -25,8 +26,7 @@ public class NewUserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_user);
         name = findViewById(R.id.name);
-        UserDao dao = Database.getInstance(this).getUserDao();
-        repo = new UserRepository(dao);
+        api_link = findViewById(R.id.api_link);
 
     }
 
@@ -38,18 +38,39 @@ public class NewUserActivity extends AppCompatActivity {
             name.setError("User must have a name.");
             return;
         }
+
+        UserDao dao = Database.getInstance(this).getUserDao();
+        SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
+        String link = preferences.getString("API_Link", "");
+        Log.d("test", link);
+        if (link.equals("")) {
+            repo = new UserRepository(dao);
+        } else {
+            Log.d("test", link);
+            repo = new UserRepository(dao, link);
+        }
+
         String public_code = UUID.randomUUID().toString();
         String private_code = UUID.randomUUID().toString();
         User new_user = new User(name.getText().toString(), public_code, 0, 0);
         repo.upsertSynced(private_code, new_user);
 
-        SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("Private", private_code);
         editor.putString("Public", public_code);
         editor.apply();
 
+        Log.d("test", public_code);
+
         Intent intent = new Intent(this, CompassActivity.class);
         startActivity(intent);
+    }
+
+    public void onSubmitNewLink(View view) {
+        SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("API_Link", api_link.getText().toString());
+        editor.apply();
+        Log.d("test2", api_link.getText().toString());
     }
 }
