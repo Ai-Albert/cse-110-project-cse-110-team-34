@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".CompassActivity">
@@ -31,11 +32,12 @@
             app:srcCompat="@drawable/compass"
             tools:layout_editor_absoluteY="0dp" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_main"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint_main"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="0dp"
+            app:layout_constraintDimensionRatio="1"
             app:layout_constraintBottom_toBottomOf="@+id/compass"
             app:layout_constraintEnd_toEndOf="@+id/compass"
             app:layout_constraintStart_toStartOf="@+id/compass"
@@ -76,6 +78,6 @@
         app:layout_constraintBottom_toTopOf="@+id/addButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/clock"
-        app:layout_constraintVertical_bias="0.516" />
+        app:layout_constraintVertical_bias="0.5" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
