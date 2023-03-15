@@ -74,6 +74,12 @@ public class CompassActivity extends AppCompatActivity {
         mainUser = userRepo.getLocal(preferences.getString("Public", ""));
         users = userRepo.getAllLocal();
 
+        //checking when the list of users is being updated
+        LocationViewModel viewModel = setupViewModel();
+        users = viewModel.getUsers();
+        users.observe(this, this::onUsersChanged);
+
+
         ConstraintLayout ll = this.findViewById(R.id.constraint_main);
 //        for (User user: users.getValue()) {
 //            views.add(addLocationView(ll, user));
@@ -96,11 +102,19 @@ public class CompassActivity extends AppCompatActivity {
         observeOrientation();
     }
 
+    private LocationViewModel setupViewModel() {
+        return new ViewModelProvider(this).get(LocationViewModel.class);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         orientationService.unregisterSensorListeners();
         locationService.unregisterLocationListener();
+    }
+
+    private void onUsersChanged(List<User> users) {
+        System.out.println("users has been changed");
     }
 
     public void updateFriendLocations() {
@@ -120,6 +134,7 @@ public class CompassActivity extends AppCompatActivity {
             if (Math.abs(compass.getRotation() - newOrientation) % 360 >= 1) {
                 compass.setRotation(newOrientation);
             }
+            //userRepo.upsertSynced(preferences.getString("Private",""), mainUser);
             updateFriendLocations();
         });
     }
