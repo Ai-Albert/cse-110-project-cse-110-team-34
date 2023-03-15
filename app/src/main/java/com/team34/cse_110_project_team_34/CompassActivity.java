@@ -15,7 +15,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -37,7 +39,7 @@ public class CompassActivity extends AppCompatActivity {
     private String main_public_uid;
     private String main_private_uid;
     private LiveData<List<User>> users;
-    private List<LocationView> views;
+    private Map<String, LocationView> locationsViews;
 
     private double lastMainLat;
     private double lastMainLong;
@@ -64,6 +66,9 @@ public class CompassActivity extends AppCompatActivity {
         setContentView(R.layout.activity_compass);
 
         userRepo = new UserRepository(Database.getInstance(this).getUserDao());
+        orientationService = OrientationService.getInstance(this);
+        locationService = LocationService.getInstance(this);
+
         SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
         main_public_uid = preferences.getString("Public", "");
         main_private_uid = preferences.getString("Private", "");
@@ -72,18 +77,10 @@ public class CompassActivity extends AppCompatActivity {
         LocationViewModel viewModel = setupViewModel();
         users = viewModel.getUsers();
         users.observe(this, this::onUsersChanged);
-
-//        ConstraintLayout ll = this.findViewById(R.id.constraint_main);
-//        for (User user: users.getValue()) {
-//            views.add(addLocationView(ll, user));
-//        }
-//        setContentView(ll);
+        locationsViews = new HashMap<>();
 
         TextView public_uid_text = this.findViewById(R.id.public_uid);
         public_uid_text.setText("Public UID: " + preferences.getString("Public", ""));
-
-        orientationService = OrientationService.getInstance(this);
-        locationService = LocationService.getInstance(this);
 
         compass = findViewById(R.id.compass);
         radius = 20;
@@ -108,12 +105,21 @@ public class CompassActivity extends AppCompatActivity {
 
     private void onUsersChanged(List<User> users) {
         System.out.println("users has been changed");
+        ConstraintLayout cl = this.findViewById(R.id.constraint_main);
+
+        for (User user : users) {
+            if (user.public_code.equals(main_public_uid)) {
+                continue;
+            }
+            if (!locationsViews.containsKey(user.public_code)) {
+                LocationView newLocation = addLocationView(cl, user);
+                locationsViews.put(user.public_code, newLocation);
+            }
+        }
     }
 
     public void updateFriendLocations() {
         // TODO: use last fetched friend users lat/long to calculate radius and angle for compass placement
-        //Log.d("update", preferences.getString("Private", ""));
-//        Log.d("Update", mainUser.getValue().toPatchJSON("aaa"));
 //        userRepo.upsertSynced(preferences.getString("Private", ""), mainUser.getValue());
 //        List<User> currUsers = users.getValue();
 //        for (int i = 0; i < currUsers.size(); i++) {
@@ -175,12 +181,11 @@ public class CompassActivity extends AppCompatActivity {
         updateFriendLocations();
     }
 
-    public LocationView addLocationView(ConstraintLayout ll, User user) {
+    public LocationView addLocationView(ConstraintLayout cl, User user) {
         View inflater = LayoutInflater.from(this)
-                .inflate(R.layout.location, ll, false);
-
+                .inflate(R.layout.location, cl, false);
         LocationView userView = new LocationView(user, inflater);
-
+        cl.addView(inflater);
         return userView;
     }
 }
