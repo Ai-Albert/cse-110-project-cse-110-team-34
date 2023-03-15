@@ -1,6 +1,5 @@
 package com.team34.cse_110_project_team_34;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;

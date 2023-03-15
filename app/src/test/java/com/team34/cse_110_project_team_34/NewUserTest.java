@@ -21,6 +21,9 @@ import database.Database;
 import database.UserDao;
 import database.UserRepository;
 
+/**
+ * Tests for Story 5
+ */
 @RunWith(RobolectricTestRunner.class)
 public class NewUserTest {
 
@@ -40,6 +43,9 @@ public class NewUserTest {
         scenario.moveToState(Lifecycle.State.RESUMED);
     }
 
+    /**
+     * Tests an invalid entered name (empty)
+     */
     @Test
     public void testAddEmptyName() {
         scenario.onActivity(activity -> {
@@ -50,6 +56,9 @@ public class NewUserTest {
         });
     }
 
+    /**
+     * Tests an valid entered name and checks if it was entered into the local database
+     */
     @Test
     public void testAddNewUser() {
         scenario.onActivity(activity -> {
