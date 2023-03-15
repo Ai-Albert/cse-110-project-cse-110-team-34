@@ -39,7 +39,6 @@ public class User {
     public double latitude;
 
     /** The last time the user's location was updated. **/
-
     @JsonAdapter(TimestampAdapter.class)
     @SerializedName("updated_at")
     public long version = 0;

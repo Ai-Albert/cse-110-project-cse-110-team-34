@@ -1,29 +1,23 @@
 package com.team34.cse_110_project_team_34;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import database.Database;
 import database.UserRepository;
@@ -37,17 +31,17 @@ import viewModel.LocationViewModel;
 public class CompassActivity extends AppCompatActivity {
 
     private UserRepository userRepo;
-    private SharedPreferences preferences;
     private OrientationService orientationService;
     private LocationService locationService;
 
-    private LiveData<User> mainUser;
+    private String main_public_uid;
+    private String main_private_uid;
+    private LiveData<List<User>> users;
+    private List<LocationView> views;
 
     private double lastMainLat;
     private double lastMainLong;
 
-    private LiveData<List<User>> users;
-    private List<LocationView> views;
 
     @VisibleForTesting
     public double radius; // Miles
@@ -70,17 +64,16 @@ public class CompassActivity extends AppCompatActivity {
         setContentView(R.layout.activity_compass);
 
         userRepo = new UserRepository(Database.getInstance(this).getUserDao());
-        preferences = getSharedPreferences("preferences", MODE_PRIVATE);
-        mainUser = userRepo.getLocal(preferences.getString("Public", ""));
-        users = userRepo.getAllLocal();
+        SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
+        main_public_uid = preferences.getString("Public", "");
+        main_private_uid = preferences.getString("Private", "");
 
         //checking when the list of users is being updated
         LocationViewModel viewModel = setupViewModel();
         users = viewModel.getUsers();
         users.observe(this, this::onUsersChanged);
 
-
-        ConstraintLayout ll = this.findViewById(R.id.constraint_main);
+//        ConstraintLayout ll = this.findViewById(R.id.constraint_main);
 //        for (User user: users.getValue()) {
 //            views.add(addLocationView(ll, user));
 //        }
@@ -134,7 +127,6 @@ public class CompassActivity extends AppCompatActivity {
             if (Math.abs(compass.getRotation() - newOrientation) % 360 >= 1) {
                 compass.setRotation(newOrientation);
             }
-            //userRepo.upsertSynced(preferences.getString("Private",""), mainUser);
             updateFriendLocations();
         });
     }
@@ -147,7 +139,12 @@ public class CompassActivity extends AppCompatActivity {
         locationService.getLocation().observe(this, location -> {
             lastMainLat = location.first;
             lastMainLong = location.second;
-            // TODO: update main user's location in remote DB
+
+            User mainUser = userRepo.getLocal(main_public_uid);
+            mainUser.setLatitude(lastMainLat);
+            mainUser.setLongitude(lastMainLong);
+
+            userRepo.updateSynced(main_private_uid, mainUser);
             updateFriendLocations();
         });
     }
