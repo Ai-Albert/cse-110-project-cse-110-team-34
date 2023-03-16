@@ -1,5 +1,7 @@
 package database;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -64,6 +66,7 @@ public class UserRepository {
     }
 
     public void updateSynced(String private_code, User user) {
+        Log.d("Syncing", "test");
         updateLocal(user);
         upsertRemote(private_code, user);
     }

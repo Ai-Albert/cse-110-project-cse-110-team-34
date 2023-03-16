@@ -103,6 +103,7 @@ public class CompassActivity extends AppCompatActivity {
         lastMainLat = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().first : 0;
         lastMainLong = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().second : 0;
 
+
         updateCircles();
         observeLocation();
         observeOrientation();
@@ -137,6 +138,7 @@ public class CompassActivity extends AppCompatActivity {
                 locationsViews.put(user.public_code, newLocation);
             }
             LocationView userView = locationsViews.get(user.public_code);
+            userView.update(user);
             updateCompassLocation(user, userView);
         }
     }
