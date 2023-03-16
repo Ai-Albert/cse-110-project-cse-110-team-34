@@ -1,4 +1,4 @@
-package model;
+package database;
 
 import android.content.SharedPreferences;
 import android.os.StrictMode;
@@ -8,6 +8,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import model.User;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -18,12 +19,22 @@ public class UserAPI {
 
     private OkHttpClient client;
 
+    private String default_link;
+
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
     public UserAPI() {
         this.client = new OkHttpClient();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+        default_link = "https://socialcompass.goto.ucsd.edu/location/";
+    }
+
+    public UserAPI(String new_link) {
+        this.client = new OkHttpClient();
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        default_link = new_link;
     }
 
 
@@ -45,7 +56,7 @@ public class UserAPI {
         public_code = public_code.replace(" ", "%20");
 
         Request request = new Request.Builder()
-                .url("https://socialcompass.goto.ucsd.edu/location/" + public_code)
+                .url(default_link + public_code)
                 .method("GET", null)
                 .build();
 
@@ -75,7 +86,7 @@ public class UserAPI {
         public_code = public_code.replace(" ", "%20");
         RequestBody requestBody = RequestBody.create(user.toPutJSON(private_code), JSON);
         Request request = new Request.Builder()
-                .url("https://socialcompass.goto.ucsd.edu/location/" + public_code)
+                .url(default_link + public_code)
                 .method("PUT", requestBody)
                 .build();
 
@@ -99,7 +110,7 @@ public class UserAPI {
         public_code = public_code.replace(" ", "%20");
         RequestBody requestBody = RequestBody.create(user.toPatchJSON(private_code), JSON);
         Request request = new Request.Builder()
-                .url("https://socialcompass.goto.ucsd.edu/location/" + public_code)
+                .url(default_link + public_code)
                 .method("PUT", requestBody)
                 .build();
 

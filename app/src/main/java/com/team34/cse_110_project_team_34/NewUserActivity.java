@@ -1,6 +1,5 @@
 package com.team34.cse_110_project_team_34;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -10,18 +9,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
-
-import java.util.Map;
-import java.util.Set;
+import database.Database;
 import java.util.UUID;
-import model.Database;
 import model.User;
-import model.UserDao;
-import model.UserRepository;
+import database.UserDao;
+import database.UserRepository;
 
 public class NewUserActivity extends AppCompatActivity {
 
     private EditText name;
+    private EditText api_link;
     private UserRepository repo;
 
     @Override
@@ -29,8 +26,7 @@ public class NewUserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_user);
         name = findViewById(R.id.name);
-        UserDao dao = Database.getInstance(this).getUserDao();
-        repo = new UserRepository(dao);
+        api_link = findViewById(R.id.api_link);
 
     }
 
@@ -42,17 +38,37 @@ public class NewUserActivity extends AppCompatActivity {
             name.setError("User must have a name.");
             return;
         }
+
+        UserDao dao = Database.getInstance(this).getUserDao();
+        SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
+        String link = preferences.getString("API_Link", "");
+        Log.d("test", link);
+        if (link.equals("")) {
+            repo = new UserRepository(dao);
+        } else {
+            Log.d("test", link);
+            repo = new UserRepository(dao, link);
+        }
+
         String public_code = UUID.randomUUID().toString();
         String private_code = UUID.randomUUID().toString();
         User new_user = new User(name.getText().toString(), public_code, 0, 0);
-        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        repo.upsertSynced(private_code, new_user);
+
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("Private", private_code);
         editor.putString("Public", public_code);
         editor.apply();
-        repo.upsertSynced(private_code, new_user);
 
-        Intent intent = new Intent(this, NewFriendActivity.class);
+        Intent intent = new Intent(this, CompassActivity.class);
         startActivity(intent);
+    }
+
+    public void onSubmitNewLink(View view) {
+        SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("API_Link", api_link.getText().toString());
+        editor.apply();
+        Log.d("test2", api_link.getText().toString());
     }
 }

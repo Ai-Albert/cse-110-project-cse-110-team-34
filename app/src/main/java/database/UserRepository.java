@@ -1,4 +1,4 @@
-package model;
+package database;
 
 import android.util.Log;
 
@@ -7,12 +7,13 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import model.User;
 
 public class UserRepository {
     private final UserDao dao;
@@ -33,6 +34,16 @@ public class UserRepository {
         liveContent.addSource(realLiveContent, liveContent::postValue);
     }
 
+    public UserRepository(UserDao dao, String new_link) {
+        this.dao = dao;
+
+        api = new UserAPI(new_link);
+        realLiveContent = new MediatorLiveData<>();
+
+        liveContent = new MediatorLiveData<>();
+        liveContent.addSource(realLiveContent, liveContent::postValue);
+    }
+
     /**
      * Gets the latest data from either the local database or remotely, whichever was
      * more recently updated.
@@ -43,13 +54,16 @@ public class UserRepository {
         Observer<User> updateFromRemote = theirUser -> {
             User ourUser = user.getValue();
             if (theirUser == null) return; // do nothing
-            if (ourUser == null || ourUser.version < theirUser.version) {
+            if (ourUser == null) {
                 upsertLocal(theirUser);
+            }
+            else if (ourUser.version < theirUser.version) {
+                updateLocal(theirUser);
             }
         };
 
         // If we get a local update, pass it on.
-        user.addSource(getLocal(public_code), user::postValue);
+        // user.addSource(getLocal(public_code), user::postValue);
         // If we get a remote update, update the local version (triggering the above observer)
         user.addSource(getRemote(public_code), updateFromRemote);
 
@@ -61,7 +75,17 @@ public class UserRepository {
         upsertRemote(private_code, user);
     }
 
-    public LiveData<User> getLocal(String public_code) {
+    public void updateSynced(String private_code, User user) {
+        Log.d("Syncing", "test");
+        updateLocal(user);
+        upsertRemote(private_code, user);
+    }
+
+    public void updateLocal(User user) {
+        dao.update(user);
+    }
+
+    public User getLocal(String public_code) {
         return dao.get(public_code);
     }
 
@@ -70,7 +94,6 @@ public class UserRepository {
     }
 
     public void upsertLocal(User user) {
-        user.version = Instant.now().getEpochSecond();
         dao.upsert(user);
     }
 
@@ -78,8 +101,8 @@ public class UserRepository {
         dao.delete(user);
     }
 
-    public boolean existsLocal(String name) {
-        return dao.exists(name);
+    public boolean existsLocal(String public_code) {
+        return dao.exists(public_code);
     }
 
     /**
