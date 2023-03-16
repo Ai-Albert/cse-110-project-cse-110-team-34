@@ -42,7 +42,7 @@ public class CompassActivity extends AppCompatActivity {
     private String main_public_uid;
     private String main_private_uid;
     private LiveData<List<User>> users;
-    private Map<String, LocationView> locationsViews;
+    private Map<String, LocationView> locationViews;
     private List<ImageView> circleViews;
 
     private double lastMainLat;
@@ -86,7 +86,7 @@ public class CompassActivity extends AppCompatActivity {
         LocationViewModel viewModel = setupViewModel();
         users = viewModel.getUsers();
         users.observe(this, this::updateFriendLocations);
-        locationsViews = new HashMap<>();
+        locationViews = new HashMap<>();
 
         // Getting the current user's public uid
         TextView public_uid_text = this.findViewById(R.id.public_uid);
@@ -138,11 +138,11 @@ public class CompassActivity extends AppCompatActivity {
 
         ConstraintLayout cl = this.findViewById(R.id.mainLayout);
         for (User user : users) {
-            if (!locationsViews.containsKey(user.public_code)) {
+            if (!locationViews.containsKey(user.public_code)) {
                 LocationView newLocation = addLocationView(cl, user);
-                locationsViews.put(user.public_code, newLocation);
+                locationViews.put(user.public_code, newLocation);
             }
-            LocationView userView = locationsViews.get(user.public_code);
+            LocationView userView = locationViews.get(user.public_code);
             updateCompassLocation(user, userView);
         }
     }
@@ -323,7 +323,7 @@ public class CompassActivity extends AppCompatActivity {
         ConstraintLayout inflater = (ConstraintLayout) LayoutInflater.from(this)
                 .inflate(R.layout.location, cl, false);
         LocationView userView = new LocationView(user, inflater);
-        locationsViews.put(user.public_code, userView);
+        locationViews.put(user.public_code, userView);
 
         ConstraintSet set = new ConstraintSet();
         set.clone(inflater);
