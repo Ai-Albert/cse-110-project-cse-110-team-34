@@ -41,14 +41,16 @@ public class NewUserActivity extends AppCompatActivity {
         String public_code = UUID.randomUUID().toString();
         String private_code = UUID.randomUUID().toString();
         User new_user = new User(name.getText().toString(), public_code, 0, 0);
-        //SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        repo.upsertSynced(private_code, new_user);
 
         SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("Private", private_code);
         editor.putString("Public", public_code);
         editor.apply();
-        repo.upsertSynced(private_code, new_user);
+
+        System.out.println(public_code);
+
         Intent intent = new Intent(this, CompassActivity.class);
         startActivity(intent);
     }

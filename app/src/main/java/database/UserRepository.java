@@ -1,5 +1,7 @@
 package database;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -42,13 +44,16 @@ public class UserRepository {
         Observer<User> updateFromRemote = theirUser -> {
             User ourUser = user.getValue();
             if (theirUser == null) return; // do nothing
-            if (ourUser == null || ourUser.version < theirUser.version) {
+            if (ourUser == null) {
                 upsertLocal(theirUser);
+            }
+            else if (ourUser.version < theirUser.version) {
+                updateLocal(theirUser);
             }
         };
 
         // If we get a local update, pass it on.
-        user.addSource(getLocal(public_code), user::postValue);
+        // user.addSource(getLocal(public_code), user::postValue);
         // If we get a remote update, update the local version (triggering the above observer)
         user.addSource(getRemote(public_code), updateFromRemote);
 
@@ -60,7 +65,17 @@ public class UserRepository {
         upsertRemote(private_code, user);
     }
 
-    public LiveData<User> getLocal(String public_code) {
+    public void updateSynced(String private_code, User user) {
+        Log.d("Syncing", "test");
+        updateLocal(user);
+        upsertRemote(private_code, user);
+    }
+
+    public void updateLocal(User user) {
+        dao.update(user);
+    }
+
+    public User getLocal(String public_code) {
         return dao.get(public_code);
     }
 

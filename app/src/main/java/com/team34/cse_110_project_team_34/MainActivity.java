@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         dao = Database.getInstance(this).getUserDao();
-        // Remove this during demo
+        // TODO: Remove this during demo
         Database.getInstance(this).clearAllTables();
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
