@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -19,6 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 
@@ -41,6 +43,8 @@ public class LocationTimeTest {
 
     UserAPI api;
 
+    User user;
+
     final String public_code = UUID.randomUUID().toString();
     final String private_code = UUID.randomUUID().toString();
 
@@ -53,7 +57,7 @@ public class LocationTimeTest {
         Database.getInstance(context).clearAllTables();
 
 
-        User user = new User("Mary", public_code, 0, 0);
+        user = new User("Mary", public_code, 0, 0);
         api.put(private_code, user);
         repo.getSynced(public_code);
 
@@ -64,7 +68,7 @@ public class LocationTimeTest {
     }
 
     /**
-     * Tests an invalid entered name (empty)
+     * Tests the correctness of the indicator
      */
     @Test
     public void testIndicator() {
@@ -74,32 +78,29 @@ public class LocationTimeTest {
             LocationView view = views.get(public_code);
             assertNotNull("Invalid View", view);
             assertEquals(view.statusView.getTag(), R.drawable.green_indicator);
-            try {
-                Thread.sleep(62000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            user.setLastUpdated(user.getLastUpdated() - 100);
+            repo.updateLocal(user);
             assertEquals(view.statusView.getTag(), R.drawable.red_indicator);
         });
     }
 
     /**
-     * Tests an valid entered name and checks if it was entered into the local database
+     * Tests the correctness of the timer.
      */
     @Test
     public void testTimer() {
         scenario.onActivity(activity -> {
-            EditText name = activity.findViewById(R.id.name);
-            Button submit = activity.findViewById(R.id.submit_new_user);
-
-            name.setText("Mary");
-            submit.performClick();
-
-            SharedPreferences preferences = activity.getSharedPreferences("preferences", Context.MODE_PRIVATE);
-            assertEquals(preferences.contains("Public"), true);
-            assertEquals(preferences.contains("Private"), true);
-
-            assertEquals(repo.existsLocal(preferences.getString("Public", "")), true);
+            ConstraintLayout layout = activity.findViewById(R.id.mainLayout);
+            Map<String, LocationView> views = activity.getLocationsViews();
+            LocationView view = views.get(public_code);
+            assertNotNull("Invalid View", view);
+            assertEquals(view.timeView.getVisibility(), View.INVISIBLE);
+            user.setLastUpdated(user.getLastUpdated() - 300);
+            repo.updateLocal(user);
+            String expected_text = "6m";
+            assertEquals(view.timeView.getText().toString(), expected_text);
         });
     }
+
+    
 }
