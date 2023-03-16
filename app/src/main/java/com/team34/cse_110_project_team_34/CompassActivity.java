@@ -5,7 +5,6 @@ import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,8 +16,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-
-import java.util.List;
 
 import database.Database;
 import database.UserRepository;
@@ -122,9 +119,6 @@ public class CompassActivity extends AppCompatActivity {
 
     public void updateFriendLocations() {
         // TODO: use last fetched friend users lat/long to calculate radius and angle for compass placement
-        //Log.d("update", preferences.getString("Private", ""));
-//        Log.d("Update", mainUser.getValue().toPatchJSON("aaa"));
-//        userRepo.upsertSynced(preferences.getString("Private", ""), mainUser.getValue());
     }
 
     public void observeOrientation() {
