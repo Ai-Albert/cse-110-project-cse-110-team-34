@@ -42,9 +42,11 @@ public class LocationView {
         nameView.setText(user.getName());
         if (user.getLastUpdated() + 60 >= Instant.now().getEpochSecond()) {
             statusView.setImageResource(R.drawable.green_indicator);
+            statusView.setTag(R.drawable.green_indicator);
             timeView.setVisibility(View.INVISIBLE);
         } else {
             statusView.setImageResource(R.drawable.red_indicator);
+            statusView.setTag(R.drawable.red_indicator);
             long seconds_since_seen = Instant.now().getEpochSecond() - user.getLastUpdated();
             if (seconds_since_seen < 3600) {
                 timeView.setText(seconds_since_seen / 60 + "m");
