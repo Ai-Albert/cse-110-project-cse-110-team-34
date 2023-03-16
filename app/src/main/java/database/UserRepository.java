@@ -102,7 +102,12 @@ public class UserRepository {
         User user = api.get(public_code);
 
         if (user != null) {
-            upsertLocal(user);
+            if (dao.exists(user.public_code)) {
+                updateLocal(user);
+            }
+            else {
+                upsertLocal(user);
+            }
         }
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         clockFuture = executor.scheduleAtFixedRate(() -> {
