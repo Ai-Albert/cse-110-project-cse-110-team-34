@@ -23,6 +23,7 @@ import database.Database;
 import database.UserAPI;
 import database.UserDao;
 import database.UserRepository;
+import model.User;
 
 /**
  * Tests for Story 5
@@ -89,7 +90,9 @@ public class NewUserTest {
             String public_key = preferences.getString("Public", "");
 
             assertTrue(repo.existsLocal(public_key));
-            assertNotNull("User was not found on remote repository", api.get(public_key));
+            User user = api.get(public_key);
+            assertNotNull("User was not found on remote repository", user);
+            assertEquals(user.getName(), "Mary");
         });
     }
 
