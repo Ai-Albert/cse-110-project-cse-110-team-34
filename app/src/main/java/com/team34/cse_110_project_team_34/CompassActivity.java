@@ -82,7 +82,7 @@ public class CompassActivity extends AppCompatActivity {
         locationsViews = new HashMap<>();
 
         TextView public_uid_text = this.findViewById(R.id.public_uid);
-        public_uid_text.setText("Public UID: " + preferences.getString("Public", ""));
+        public_uid_text.setText(String.format("%s%s", getString(R.string.publicUIDString), preferences.getString("Public", "")));
 
         // Setting up location/orientation for user
         compass = findViewById(R.id.compass);
@@ -187,8 +187,8 @@ public class CompassActivity extends AppCompatActivity {
      * @ensure friend locations on compass are updated according to new radius
      */
     public void onZoomIn(View view) {
-        if (radius >= 13) {
-            radius /= 1.5;
+        if (radius >= 20) {
+            radius /= 2;
             updateFriendLocations(users.getValue());
         }
     }
@@ -198,7 +198,7 @@ public class CompassActivity extends AppCompatActivity {
      * @ensure friend locations on compass are updated according to new radius
      */
     public void onZoomOut(View view) {
-        this.radius *= 1.5;
+        this.radius *= 2;
         updateFriendLocations(users.getValue());
     }
 
