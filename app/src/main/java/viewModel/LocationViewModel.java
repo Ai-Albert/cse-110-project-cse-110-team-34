@@ -10,7 +10,6 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 
 import database.Database;
-import database.UserDao;
 import database.UserRepository;
 import model.User;
 

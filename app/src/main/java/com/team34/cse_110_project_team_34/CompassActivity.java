@@ -3,9 +3,14 @@ package com.team34.cse_110_project_team_34;
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
+<<<<<<< HEAD
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+=======
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
+>>>>>>> dev
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
@@ -29,7 +34,10 @@ import viewModel.LocationViewModel;
 public class CompassActivity extends AppCompatActivity {
 
     private UserRepository userRepo;
+<<<<<<< HEAD
     private SharedPreferences preferences;
+=======
+>>>>>>> dev
     private OrientationService orientationService;
     private LocationService locationService;
 
@@ -61,9 +69,12 @@ public class CompassActivity extends AppCompatActivity {
         setContentView(R.layout.activity_compass);
 
         userRepo = new UserRepository(Database.getInstance(this).getUserDao());
+<<<<<<< HEAD
         preferences = getPreferences(MODE_PRIVATE);
         Log.d("create", preferences.getString("Private", ""));
         mainUser = userRepo.getLocal(preferences.getString("Public", ""));
+=======
+>>>>>>> dev
 
         orientationService = OrientationService.getInstance(this);
         locationService = LocationService.getInstance(this);
@@ -88,10 +99,14 @@ public class CompassActivity extends AppCompatActivity {
 
     @NonNull
     private LocationAdapter setupAdapter(LocationViewModel viewModel) {
+<<<<<<< HEAD
         SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
         String public_uid = preferences.getString("Public", "null");
 
         LocationAdapter adapter = new LocationAdapter(public_uid);
+=======
+        LocationAdapter adapter = new LocationAdapter();
+>>>>>>> dev
         adapter.setHasStableIds(true);
         viewModel.getUsers().observe(this, adapter::setUsers);
         return adapter;
@@ -105,8 +120,12 @@ public class CompassActivity extends AppCompatActivity {
     private void setupRecycler(LocationAdapter adapter) {
         // We store the recycler view in a field _only_ because we will want to access it in tests.
         recyclerView = findViewById(R.id.recycler_main);
+<<<<<<< HEAD
         // TODO: Make a custom layout manager
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+=======
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2 /* TODO: Figure out what number? */));
+>>>>>>> dev
         recyclerView.setAdapter(adapter);
     }
 
@@ -119,6 +138,7 @@ public class CompassActivity extends AppCompatActivity {
 
     public void updateFriendLocations() {
         // TODO: use last fetched friend users lat/long to calculate radius and angle for compass placement
+
     }
 
     public void observeOrientation() {

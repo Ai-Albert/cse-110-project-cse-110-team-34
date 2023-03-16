@@ -1,6 +1,5 @@
 package view;
 
-import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.team34.cse_110_project_team_34.R;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,11 +18,6 @@ import model.User;
 
 public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
     private List<User> users = Collections.emptyList();
-    private String public_uid;
-
-    public LocationAdapter(String public_uid) {
-        this.public_uid = public_uid;
-    }
 
     /**
      * This time around, the ViewHolder is much simpler, just data.
@@ -46,26 +39,12 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
 
         public void bind(User user) {
             nameView.setText(user.getName());
-            if (user.getLastUpdated() + 60 >= Instant.now().getEpochSecond()) {
-                statusView.setImageResource(R.drawable.green_indicator);
-            } else {
-                statusView.setImageResource(R.drawable.red_indicator);
-            }
+            statusView.setImageResource(R.drawable.green_indicator);
         }
     }
 
     public void setUsers(List<User> users) {
         this.users = users;
-
-        User curr = null;
-        for (User u : users) {
-            if (u.public_code.equals(public_uid)) {
-                curr = u;
-                break;
-            }
-        }
-        users.remove(curr);
-
         notifyDataSetChanged();
     }
 
