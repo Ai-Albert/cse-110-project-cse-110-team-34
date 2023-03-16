@@ -3,9 +3,11 @@ package com.team34.cse_110_project_team_34;
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
+
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
+
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -33,6 +35,7 @@ import viewModel.LocationViewModel;
 public class CompassActivity extends AppCompatActivity {
 
     private UserRepository userRepo;
+    private SharedPreferences preferences;
     private OrientationService orientationService;
     private LocationService locationService;
 
@@ -66,6 +69,9 @@ public class CompassActivity extends AppCompatActivity {
         setContentView(R.layout.activity_compass);
 
         userRepo = new UserRepository(Database.getInstance(this).getUserDao());
+
+        preferences = getPreferences(MODE_PRIVATE);
+
         orientationService = OrientationService.getInstance(this);
         locationService = LocationService.getInstance(this);
 
@@ -96,7 +102,6 @@ public class CompassActivity extends AppCompatActivity {
         return new ViewModelProvider(this).get(LocationViewModel.class);
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -121,11 +126,7 @@ public class CompassActivity extends AppCompatActivity {
 
     public void updateFriendLocations() {
         // TODO: use last fetched friend users lat/long to calculate radius and angle for compass placement
-//        userRepo.upsertSynced(preferences.getString("Private", ""), mainUser.getValue());
-//        List<User> currUsers = users.getValue();
-//        for (int i = 0; i < currUsers.size(); i++) {
-//            views.get(i).update(currUsers.get(i));
-//        }
+
     }
 
     public void observeOrientation() {
