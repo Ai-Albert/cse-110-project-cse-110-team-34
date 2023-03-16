@@ -29,6 +29,11 @@ public class LocationView {
         this.itemView = view;
         this.nameView = itemView.findViewById(R.id.location_name);
         this.statusView = itemView.findViewById(R.id.indicator);
+
+        this.itemView.setId(View.generateViewId());
+        this.nameView.setId(View.generateViewId());
+        this.statusView.setId(View.generateViewId());
+
         update(user);
     }
 

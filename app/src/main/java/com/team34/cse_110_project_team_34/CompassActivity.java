@@ -108,12 +108,17 @@ public class CompassActivity extends AppCompatActivity {
     }
 
     private void updateFriendLocations(List<User> users) {
-        if (users == null) return;
-        ConstraintLayout cl = this.findViewById(R.id.compassLayout);
+        if (users == null) {
+            return;
+        }
 
+        ConstraintLayout cl = this.findViewById(R.id.mainLayout);
         for (User user : users) {
             if (!locationsViews.containsKey(user.public_code)) {
                 LocationView newLocation = addLocationView(cl, user);
+                if (user.public_code.equals(main_public_uid)) {
+                    newLocation.nameView.setText("");
+                }
                 locationsViews.put(user.public_code, newLocation);
             }
             LocationView userView = locationsViews.get(user.public_code);
@@ -122,14 +127,28 @@ public class CompassActivity extends AppCompatActivity {
     }
 
     public void updateCompassLocation(User user, LocationView userView) {
-        float azimuth = compass.getRotation() + Calculation.getAngle(lastMainLat, lastMainLong, user.latitude, user.longitude);
+        float azimuth = compass.getRotation() + 90 + Calculation.getAngle(lastMainLat, lastMainLong, user.latitude, user.longitude);
         float distance = Calculation.getDistance(lastMainLat, lastMainLong, user.latitude, user.longitude);
         int compassRadius = (int) (distance / radius * (getScreenWidth() - 32));
 
+        if (distance > radius) {
+            compassRadius = 500;
+        }
+        if (user.public_code.equals(main_public_uid)) {
+            compassRadius = 0;
+        }
+
+        System.out.println(user.name);
+        System.out.println(distance);
+        System.out.println(user.latitude);
+        System.out.println(user.longitude);
+        System.out.println(azimuth);
+        System.out.println(compassRadius);
+
         ConstraintSet constraintSet = new ConstraintSet();
-        constraintSet.clone(compassLayout);
-        constraintSet.constrainCircle(userView.itemView.getId(), compass.getId(), compassRadius, azimuth);
-        constraintSet.applyTo(compassLayout);
+        constraintSet.clone((ConstraintLayout) findViewById(R.id.mainLayout));
+        constraintSet.constrainCircle(userView.itemView.getId(), compassLayout.getId(), compassRadius, azimuth);
+        constraintSet.applyTo(findViewById(R.id.mainLayout));
     }
 
     public void observeOrientation() {
