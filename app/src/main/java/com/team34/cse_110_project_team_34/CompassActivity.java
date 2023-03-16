@@ -3,6 +3,7 @@ package com.team34.cse_110_project_team_34;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -12,14 +13,13 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import database.Database;
 import database.UserRepository;
@@ -65,10 +65,12 @@ public class CompassActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compass);
 
+        // Setting up services
         userRepo = new UserRepository(Database.getInstance(this).getUserDao());
         orientationService = OrientationService.getInstance(this);
         locationService = LocationService.getInstance(this);
 
+        // Main user's uid info
         SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
         main_public_uid = preferences.getString("Public", "");
         main_private_uid = preferences.getString("Private", "");
@@ -76,12 +78,13 @@ public class CompassActivity extends AppCompatActivity {
         //checking when the list of users is being updated
         LocationViewModel viewModel = setupViewModel();
         users = viewModel.getUsers();
-        users.observe(this, this::onUsersChanged);
+        users.observe(this, this::updateFriendLocations);
         locationsViews = new HashMap<>();
 
         TextView public_uid_text = this.findViewById(R.id.public_uid);
         public_uid_text.setText("Public UID: " + preferences.getString("Public", ""));
 
+        // Setting up location/orientation for user
         compass = findViewById(R.id.compass);
         radius = 20;
 
@@ -103,28 +106,26 @@ public class CompassActivity extends AppCompatActivity {
         locationService.unregisterLocationListener();
     }
 
-    private void onUsersChanged(List<User> users) {
-        System.out.println("users has been changed");
-        ConstraintLayout cl = this.findViewById(R.id.constraint_main);
+    private void updateFriendLocations(List<User> users) {
+        if (users == null) return;
+
+        ConstraintLayout cl = this.findViewById(R.id.mainLayout);
 
         for (User user : users) {
-            if (user.public_code.equals(main_public_uid)) {
-                continue;
-            }
             if (!locationsViews.containsKey(user.public_code)) {
                 LocationView newLocation = addLocationView(cl, user);
                 locationsViews.put(user.public_code, newLocation);
             }
+            LocationView locationView = locationsViews.get(user.public_code);
+            updateCompassLocation(user, locationView);
         }
     }
 
-    public void updateFriendLocations() {
-        // TODO: use last fetched friend users lat/long to calculate radius and angle for compass placement
-//        userRepo.upsertSynced(preferences.getString("Private", ""), mainUser.getValue());
-//        List<User> currUsers = users.getValue();
-//        for (int i = 0; i < currUsers.size(); i++) {
-//            views.get(i).update(currUsers.get(i));
-//        }
+    public void updateCompassLocation(User user, LocationView locationView) {
+        ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) locationView.itemView.getLayoutParams();
+        float azimuth = Calculation.getAngle(lastMainLat, lastMainLong, user.latitude, user.longitude);
+        layoutParams.circleAngle = compass.getRotation() + azimuth;
+        locationView.itemView.setLayoutParams(layoutParams);
     }
 
     public void observeOrientation() {
@@ -133,7 +134,7 @@ public class CompassActivity extends AppCompatActivity {
             if (Math.abs(compass.getRotation() - newOrientation) % 360 >= 1) {
                 compass.setRotation(newOrientation);
             }
-            updateFriendLocations();
+            updateFriendLocations(users.getValue());
         });
     }
 
@@ -151,7 +152,7 @@ public class CompassActivity extends AppCompatActivity {
             mainUser.setLongitude(lastMainLong);
 
             userRepo.updateSynced(main_private_uid, mainUser);
-            updateFriendLocations();
+            updateFriendLocations(users.getValue());
         });
     }
 
@@ -168,7 +169,7 @@ public class CompassActivity extends AppCompatActivity {
     public void onZoomIn(View view) {
         if (radius >= 13) {
             radius /= 1.5;
-            updateFriendLocations();
+            updateFriendLocations(users.getValue());
         }
     }
 
@@ -178,14 +179,48 @@ public class CompassActivity extends AppCompatActivity {
      */
     public void onZoomOut(View view) {
         this.radius *= 1.5;
-        updateFriendLocations();
+        updateFriendLocations(users.getValue());
     }
 
     public LocationView addLocationView(ConstraintLayout cl, User user) {
         View inflater = LayoutInflater.from(this)
                 .inflate(R.layout.location, cl, false);
         LocationView userView = new LocationView(user, inflater);
+        setConstraints(userView);
+
         cl.addView(inflater);
         return userView;
+    }
+
+    private void setConstraints(LocationView userView) {
+        // Setting size for ConstraintLayout parent view
+        ConstraintLayout.LayoutParams constraintLayoutParams = new ConstraintLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        userView.itemView.setLayoutParams(constraintLayoutParams);
+
+        // Setting size for TextView name
+        userView.nameView.setTextSize(18);
+        ConstraintLayout.LayoutParams nameParams = new ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+        userView.nameView.setLayoutParams(nameParams);
+
+        // Setting size for ImageView status
+        ConstraintLayout.LayoutParams statusParams = new ConstraintLayout.LayoutParams(22, 22);
+        userView.statusView.setLayoutParams(statusParams);
+
+        // Adding constraints
+        ConstraintSet constraintSet = new ConstraintSet();
+        constraintSet.clone((ConstraintLayout) userView.itemView);
+
+        // Constraints for location name
+        constraintSet.connect(userView.nameView.getId(), ConstraintSet.TOP,
+                userView.itemView.getId(), ConstraintSet.TOP);
+
+        // Constraints for status indicator
+        constraintSet.centerHorizontally(userView.statusView.getId(), userView.nameView.getId());
+        constraintSet.connect(userView.statusView.getId(), ConstraintSet.TOP,
+                userView.nameView.getId(), ConstraintSet.BOTTOM);
+
+        constraintSet.applyTo((ConstraintLayout) userView.itemView);
     }
 }

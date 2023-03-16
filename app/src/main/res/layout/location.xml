@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:id="@+id/locationLayout"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground">
 
@@ -22,10 +23,10 @@
         android:id="@+id/indicator"
         android:layout_width="22dp"
         android:layout_height="22dp"
-        app:srcCompat="@drawable/green_indicator"
-        app:layout_constraintStart_toStartOf="@id/location_name"
         app:layout_constraintEnd_toEndOf="@id/location_name"
-        app:layout_constraintTop_toBottomOf="@id/location_name" />
+        app:layout_constraintStart_toStartOf="@id/location_name"
+        app:layout_constraintTop_toBottomOf="@id/location_name"
+        app:srcCompat="@drawable/green_indicator" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

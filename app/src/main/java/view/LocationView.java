@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.team34.cse_110_project_team_34.R;
@@ -16,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 import model.User;
+import utilities.Calculation;
 
 public class LocationView {
 
