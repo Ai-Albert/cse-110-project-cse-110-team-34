@@ -162,7 +162,6 @@ public class CompassActivity extends AppCompatActivity {
         locationService.getLocation().observe(this, location -> {
             float distanceChange = Calculation.getDistance(lastMainLat, lastMainLong, location.first, location.second);
             if (distanceChange > 0.01) {
-                System.out.println("location");
                 lastMainLat = location.first;
                 lastMainLong = location.second;
 
@@ -206,6 +205,12 @@ public class CompassActivity extends AppCompatActivity {
         ConstraintLayout inflater = (ConstraintLayout) LayoutInflater.from(this)
                 .inflate(R.layout.location, cl, false);
         LocationView userView = new LocationView(user, inflater);
+
+        ConstraintSet set = new ConstraintSet();
+        set.clone(inflater);
+        set.connect(userView.nameView.getId(), ConstraintSet.TOP, userView.statusView.getId(), ConstraintSet.BOTTOM);
+        set.applyTo(inflater);
+
         cl.addView(inflater);
         return userView;
     }
