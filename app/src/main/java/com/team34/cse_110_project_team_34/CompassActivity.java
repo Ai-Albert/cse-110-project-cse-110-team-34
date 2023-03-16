@@ -42,7 +42,8 @@ public class CompassActivity extends AppCompatActivity {
     private String main_public_uid;
     private String main_private_uid;
     private LiveData<List<User>> users;
-    private Map<String, LocationView> locationViews;
+    @VisibleForTesting
+    public Map<String, LocationView> locationViews;
     private List<ImageView> circleViews;
 
     private double lastMainLat;
