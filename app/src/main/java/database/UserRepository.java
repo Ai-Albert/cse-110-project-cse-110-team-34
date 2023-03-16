@@ -1,5 +1,7 @@
 package database;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -52,8 +54,11 @@ public class UserRepository {
         Observer<User> updateFromRemote = theirUser -> {
             User ourUser = user.getValue();
             if (theirUser == null) return; // do nothing
-            if (ourUser == null || ourUser.version < theirUser.version) {
+            if (ourUser == null) {
                 upsertLocal(theirUser);
+            }
+            else if (ourUser.version < theirUser.version) {
+                updateLocal(theirUser);
             }
         };
 
@@ -71,6 +76,7 @@ public class UserRepository {
     }
 
     public void updateSynced(String private_code, User user) {
+        Log.d("Syncing", "test");
         updateLocal(user);
         upsertRemote(private_code, user);
     }

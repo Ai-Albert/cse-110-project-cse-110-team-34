@@ -14,4 +14,5 @@
     <string name="added">\"Successfully added \"</string>
     <string name="api_link">API Link</string>
     <string name="save">Save</string>
+    <string name="publicUIDString">\"Public UID: \"</string>
 </resources>

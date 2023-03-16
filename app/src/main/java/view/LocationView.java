@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.team34.cse_110_project_team_34.R;
@@ -18,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import model.User;
+import utilities.Calculation;
 
 public class LocationView {
 
@@ -32,12 +34,11 @@ public class LocationView {
         this.nameView = itemView.findViewById(R.id.location_name);
         this.statusView = itemView.findViewById(R.id.indicator);
         this.timeView = itemView.findViewById(R.id.last_live);
+
         update(user);
     }
 
     public void update(User user) {
-        // TODO: Add positioning logic
-
         nameView.setText(user.getName());
         if (user.getLastUpdated() + 60 >= Instant.now().getEpochSecond()) {
             statusView.setImageResource(R.drawable.green_indicator);
