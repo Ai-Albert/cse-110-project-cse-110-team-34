@@ -116,9 +116,6 @@ public class CompassActivity extends AppCompatActivity {
         for (User user : users) {
             if (!locationsViews.containsKey(user.public_code)) {
                 LocationView newLocation = addLocationView(cl, user);
-                if (user.public_code.equals(main_public_uid)) {
-                    newLocation.nameView.setText("");
-                }
                 locationsViews.put(user.public_code, newLocation);
             }
             LocationView userView = locationsViews.get(user.public_code);
@@ -131,11 +128,14 @@ public class CompassActivity extends AppCompatActivity {
         float distance = Calculation.getDistance(lastMainLat, lastMainLong, user.latitude, user.longitude);
         int compassRadius = (int) (distance / radius * COMPASS_EDGE);
 
+        userView.nameView.setText(user.name);
         if (compassRadius > COMPASS_EDGE) {
             compassRadius = (int) COMPASS_EDGE;
+            userView.nameView.setText("");
         }
         if (user.public_code.equals(main_public_uid)) {
             compassRadius = 0;
+            userView.nameView.setText("");
         }
 
         ConstraintSet constraintSet = new ConstraintSet();

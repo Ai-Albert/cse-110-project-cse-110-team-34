@@ -38,8 +38,6 @@ public class LocationView {
     }
 
     public void update(User user) {
-        // TODO: Add positioning logic
-
         nameView.setText(user.getName());
         if (user.getLastUpdated() + 60 >= Instant.now().getEpochSecond()) {
             statusView.setImageResource(R.drawable.green_indicator);
