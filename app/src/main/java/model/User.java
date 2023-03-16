@@ -1,7 +1,5 @@
 package model;
 
-import android.os.health.SystemHealthManager;
-
 import androidx.annotation.NonNull;
 
 import androidx.room.Entity;
@@ -50,7 +48,6 @@ public class User {
         this.longitude = longitude;
         this.latitude = latitude;
         this.public_code = public_code;
-        this.version = Instant.now().getEpochSecond();
     }
 
     public boolean equals(User user) {
@@ -79,10 +76,6 @@ public class User {
 
     public void setLatitude(double latitude) {
         this.latitude = latitude;
-    }
-
-    public long getLastUpdated() {
-        return version;
     }
 
     public static User fromJSON(String json) {

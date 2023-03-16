@@ -68,7 +68,7 @@ public class NewUserTest {
             name.setText("Mary");
             submit.performClick();
 
-            SharedPreferences preferences = activity.getSharedPreferences("preferences", Context.MODE_PRIVATE);
+            SharedPreferences preferences = activity.getPreferences(Context.MODE_PRIVATE);
             assertEquals(preferences.contains("Public"), true);
             assertEquals(preferences.contains("Private"), true);
 

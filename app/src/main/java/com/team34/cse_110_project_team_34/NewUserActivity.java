@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -41,14 +40,13 @@ public class NewUserActivity extends AppCompatActivity {
         String public_code = UUID.randomUUID().toString();
         String private_code = UUID.randomUUID().toString();
         User new_user = new User(name.getText().toString(), public_code, 0, 0);
-        //SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-
-        SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("Private", private_code);
         editor.putString("Public", public_code);
         editor.apply();
         repo.upsertSynced(private_code, new_user);
+
         Intent intent = new Intent(this, CompassActivity.class);
         startActivity(intent);
     }

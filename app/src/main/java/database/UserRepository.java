@@ -5,6 +5,7 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -69,6 +70,7 @@ public class UserRepository {
     }
 
     public void upsertLocal(User user) {
+        user.version = Instant.now().getEpochSecond();
         dao.upsert(user);
     }
 
