@@ -44,9 +44,9 @@ public class CompassActivity extends AppCompatActivity {
     private double lastMainLat;
     private double lastMainLong;
 
-
     @VisibleForTesting
     public double radius; // Miles
+    private final double COMPASS_EDGE = (getScreenWidth() - 32) / 2.0;
 
     private ImageView compass;
     private ConstraintLayout compassLayout;
@@ -129,10 +129,10 @@ public class CompassActivity extends AppCompatActivity {
     public void updateCompassLocation(User user, LocationView userView) {
         float azimuth = compass.getRotation() + Calculation.getAngle(lastMainLat, lastMainLong, user.latitude, user.longitude);
         float distance = Calculation.getDistance(lastMainLat, lastMainLong, user.latitude, user.longitude);
-        int compassRadius = (int) (distance / radius * (getScreenWidth() - 32));
+        int compassRadius = (int) (distance / radius * COMPASS_EDGE);
 
-        if (distance > radius) {
-            compassRadius = 500;
+        if (compassRadius > COMPASS_EDGE) {
+            compassRadius = (int) COMPASS_EDGE;
         }
         if (user.public_code.equals(main_public_uid)) {
             compassRadius = 0;
