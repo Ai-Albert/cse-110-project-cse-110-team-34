@@ -36,7 +36,7 @@ public class ZoomTest {
             assertEquals(20, activity.radius, 1);
             Button zoomIn = activity.findViewById(R.id.zoomInButton);
             zoomIn.performClick();
-            assertEquals(13.33, activity.radius, 1);
+            assertEquals(10, activity.radius, 1);
         });
     }
 
@@ -46,7 +46,7 @@ public class ZoomTest {
             assertEquals(20, activity.radius, 1);
             Button zoomOut = activity.findViewById(R.id.zoomOutButton);
             zoomOut.performClick();
-            assertEquals(30, activity.radius, 1);
+            assertEquals(40, activity.radius, 1);
         });
     }
 }
