@@ -50,7 +50,7 @@ public class CompassActivity extends AppCompatActivity {
 
     @VisibleForTesting
     public int radius; // Miles
-    public final int[] radii = {1, 10, 500}; // TODO: make zooms match this
+    public final int[] radii = {1, 10, 500, Integer.MAX_VALUE};
     public int radiusIndex;
 
     private final double COMPASS_EDGE = (getScreenWidth() - 32) / 2.0;
@@ -297,7 +297,7 @@ public class CompassActivity extends AppCompatActivity {
         updateFriendLocations(users.getValue());
 
         setClickable(findViewById(R.id.zoomInButton));
-        if (radiusIndex == 2) {
+        if (radiusIndex == 3) {
             setNotClickable(findViewById(R.id.zoomOutButton));
         }
     }
@@ -323,6 +323,7 @@ public class CompassActivity extends AppCompatActivity {
         ConstraintLayout inflater = (ConstraintLayout) LayoutInflater.from(this)
                 .inflate(R.layout.location, cl, false);
         LocationView userView = new LocationView(user, inflater);
+        locationsViews.put(user.public_code, userView);
 
         ConstraintSet set = new ConstraintSet();
         set.clone(inflater);
