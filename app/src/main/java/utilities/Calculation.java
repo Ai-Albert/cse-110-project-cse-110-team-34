@@ -17,6 +17,12 @@ public class Calculation {
         return (float) degsFromN;
     }
 
+    public static float getDistance(double lat1, double long1, double lat2, double long2) {
+        double dLat = lat2 - lat1;
+        double dLng = long1 - long2;
+        return (float) Math.sqrt(dLat * dLat + dLng * dLng) * 69;
+    }
+
     public static String getRandomUID(int length) {
         int leftLimit = 48; // numeral '0'
         int rightLimit = 122; // letter 'z'

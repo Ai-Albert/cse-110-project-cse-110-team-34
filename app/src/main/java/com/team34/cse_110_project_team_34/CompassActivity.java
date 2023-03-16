@@ -49,7 +49,7 @@ public class CompassActivity extends AppCompatActivity {
     public double radius; // Miles
 
     private ImageView compass;
-
+    private ConstraintLayout compassLayout;
 
     // screen width/height used for UI element layout
     public static int getScreenWidth() {
@@ -86,6 +86,7 @@ public class CompassActivity extends AppCompatActivity {
 
         // Setting up location/orientation for user
         compass = findViewById(R.id.compass);
+        compassLayout = findViewById(R.id.compassLayout);
         radius = 20;
 
         lastMainLat = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().first : 0;
@@ -108,24 +109,27 @@ public class CompassActivity extends AppCompatActivity {
 
     private void updateFriendLocations(List<User> users) {
         if (users == null) return;
-
-        ConstraintLayout cl = this.findViewById(R.id.mainLayout);
+        ConstraintLayout cl = this.findViewById(R.id.compassLayout);
 
         for (User user : users) {
             if (!locationsViews.containsKey(user.public_code)) {
                 LocationView newLocation = addLocationView(cl, user);
                 locationsViews.put(user.public_code, newLocation);
             }
-            LocationView locationView = locationsViews.get(user.public_code);
-            updateCompassLocation(user, locationView);
+            LocationView userView = locationsViews.get(user.public_code);
+            updateCompassLocation(user, userView);
         }
     }
 
-    public void updateCompassLocation(User user, LocationView locationView) {
-        ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) locationView.itemView.getLayoutParams();
-        float azimuth = Calculation.getAngle(lastMainLat, lastMainLong, user.latitude, user.longitude);
-        layoutParams.circleAngle = compass.getRotation() + azimuth;
-        locationView.itemView.setLayoutParams(layoutParams);
+    public void updateCompassLocation(User user, LocationView userView) {
+        float azimuth = compass.getRotation() + Calculation.getAngle(lastMainLat, lastMainLong, user.latitude, user.longitude);
+        float distance = Calculation.getDistance(lastMainLat, lastMainLong, user.latitude, user.longitude);
+        int compassRadius = (int) (distance / radius * (getScreenWidth() - 32));
+
+        ConstraintSet constraintSet = new ConstraintSet();
+        constraintSet.clone(compassLayout);
+        constraintSet.constrainCircle(userView.itemView.getId(), compass.getId(), compassRadius, azimuth);
+        constraintSet.applyTo(compassLayout);
     }
 
     public void observeOrientation() {
@@ -133,8 +137,8 @@ public class CompassActivity extends AppCompatActivity {
             float newOrientation = Calculation.getCompassRotation(orientation);
             if (Math.abs(compass.getRotation() - newOrientation) % 360 >= 1) {
                 compass.setRotation(newOrientation);
+                updateFriendLocations(users.getValue());
             }
-            updateFriendLocations(users.getValue());
         });
     }
 
@@ -144,15 +148,19 @@ public class CompassActivity extends AppCompatActivity {
      */
     public void observeLocation() {
         locationService.getLocation().observe(this, location -> {
-            lastMainLat = location.first;
-            lastMainLong = location.second;
+            float distanceChange = Calculation.getDistance(lastMainLat, lastMainLong, location.first, location.second);
+            if (distanceChange > 0.01) {
+                System.out.println("location");
+                lastMainLat = location.first;
+                lastMainLong = location.second;
 
-            User mainUser = userRepo.getLocal(main_public_uid);
-            mainUser.setLatitude(lastMainLat);
-            mainUser.setLongitude(lastMainLong);
+                User mainUser = userRepo.getLocal(main_public_uid);
+                mainUser.setLatitude(lastMainLat);
+                mainUser.setLongitude(lastMainLong);
 
-            userRepo.updateSynced(main_private_uid, mainUser);
-            updateFriendLocations(users.getValue());
+                userRepo.updateSynced(main_private_uid, mainUser);
+                updateFriendLocations(users.getValue());
+            }
         });
     }
 
@@ -183,44 +191,10 @@ public class CompassActivity extends AppCompatActivity {
     }
 
     public LocationView addLocationView(ConstraintLayout cl, User user) {
-        View inflater = LayoutInflater.from(this)
+        ConstraintLayout inflater = (ConstraintLayout) LayoutInflater.from(this)
                 .inflate(R.layout.location, cl, false);
         LocationView userView = new LocationView(user, inflater);
-        setConstraints(userView);
-
         cl.addView(inflater);
         return userView;
-    }
-
-    private void setConstraints(LocationView userView) {
-        // Setting size for ConstraintLayout parent view
-        ConstraintLayout.LayoutParams constraintLayoutParams = new ConstraintLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        userView.itemView.setLayoutParams(constraintLayoutParams);
-
-        // Setting size for TextView name
-        userView.nameView.setTextSize(18);
-        ConstraintLayout.LayoutParams nameParams = new ConstraintLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
-        userView.nameView.setLayoutParams(nameParams);
-
-        // Setting size for ImageView status
-        ConstraintLayout.LayoutParams statusParams = new ConstraintLayout.LayoutParams(22, 22);
-        userView.statusView.setLayoutParams(statusParams);
-
-        // Adding constraints
-        ConstraintSet constraintSet = new ConstraintSet();
-        constraintSet.clone((ConstraintLayout) userView.itemView);
-
-        // Constraints for location name
-        constraintSet.connect(userView.nameView.getId(), ConstraintSet.TOP,
-                userView.itemView.getId(), ConstraintSet.TOP);
-
-        // Constraints for status indicator
-        constraintSet.centerHorizontally(userView.statusView.getId(), userView.nameView.getId());
-        constraintSet.connect(userView.statusView.getId(), ConstraintSet.TOP,
-                userView.nameView.getId(), ConstraintSet.BOTTOM);
-
-        constraintSet.applyTo((ConstraintLayout) userView.itemView);
     }
 }
