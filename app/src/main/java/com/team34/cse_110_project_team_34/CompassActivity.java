@@ -10,9 +10,11 @@ import androidx.lifecycle.ViewModelProvider;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -35,6 +37,7 @@ public class CompassActivity extends AppCompatActivity {
     private UserRepository userRepo;
     private OrientationService orientationService;
     private LocationService locationService;
+    SharedPreferences preferences;
 
     private String main_public_uid;
     private String main_private_uid;
@@ -46,7 +49,10 @@ public class CompassActivity extends AppCompatActivity {
     private double lastMainLong;
 
     @VisibleForTesting
-    public double radius; // Miles
+    public int radius; // Miles
+    public final int[] radii = {1, 10, 500}; // TODO: make zooms match this
+    public int radiusIndex;
+
     private final double COMPASS_EDGE = (getScreenWidth() - 32) / 2.0;
 
     private ImageView compass;
@@ -72,7 +78,7 @@ public class CompassActivity extends AppCompatActivity {
         locationService = LocationService.getInstance(this);
 
         // Main user's uid info
-        SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
+        preferences = getSharedPreferences("preferences", MODE_PRIVATE);
         main_public_uid = preferences.getString("Public", "");
         main_private_uid = preferences.getString("Private", "");
 
@@ -86,12 +92,20 @@ public class CompassActivity extends AppCompatActivity {
         TextView public_uid_text = this.findViewById(R.id.public_uid);
         public_uid_text.setText(String.format("%s%s", getString(R.string.publicUIDString), preferences.getString("Public", "")));
 
-        // Setting up location/orientation for user
+        // Setting up compass
         compass = findViewById(R.id.compass);
         compassLayout = findViewById(R.id.compassLayout);
         circleViews = new ArrayList<>();
-        radius = 20;
+        radius = preferences.getInt("Radius", 10);
+        radiusIndex = preferences.getInt("Index", 1);
+        if (radiusIndex == 0) {
+            setNotClickable(findViewById(R.id.zoomInButton));
+        }
+        else if (radiusIndex == 2) {
+            setNotClickable(findViewById(R.id.zoomOutButton));
+        }
 
+        // Setting up location/orientation for user
         lastMainLat = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().first : 0;
         lastMainLong = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().second : 0;
 
@@ -161,6 +175,9 @@ public class CompassActivity extends AppCompatActivity {
         userView.itemView.bringToFront();
     }
 
+    /**
+     * Draws equidistant concentric circles based on the current zoom level.
+     */
     public void updateCircles() {
         ConstraintLayout cl = findViewById(R.id.mainLayout);
 
@@ -169,14 +186,20 @@ public class CompassActivity extends AppCompatActivity {
         }
         circleViews.clear();
 
-        int currRadius = 10;
-        while (currRadius <= radius) {
-            drawCircle(currRadius);
-            currRadius *= 2;
+        int currIndex = 0;
+        while (currIndex <= radiusIndex) {
+            drawCircle(currIndex + 1, radiusIndex + 1);
+            currIndex++;
         }
     }
 
-    public void drawCircle(int circleRadius) {
+    /**
+     * Draws a circle for a certain distance based on the current zoom level.
+     *
+     * @param currIndex The index for the distance of the circle in radii
+     * @param radiusIndex The index of our current zoom level
+     */
+    public void drawCircle(int currIndex, int radiusIndex) {
         ConstraintLayout cl = findViewById(R.id.mainLayout);
 
         ImageView circle = new ImageView(this);
@@ -186,7 +209,7 @@ public class CompassActivity extends AppCompatActivity {
         circleViews.add(circle);
 
         ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) circle.getLayoutParams();
-        int trueRadius = (int) (((float) circleRadius / radius) * COMPASS_EDGE);
+        int trueRadius = (int) (((float) currIndex / radiusIndex) * COMPASS_EDGE);
         lp.width = (int) (trueRadius * 2);
         lp.height = (int) (trueRadius * 2);
         circle.setLayoutParams(lp);
@@ -242,10 +265,19 @@ public class CompassActivity extends AppCompatActivity {
      * @ensure friend locations on compass are updated according to new radius
      */
     public void onZoomIn(View view) {
-        if (radius >= 20) {
-            radius /= 2;
-            updateCircles();
-            updateFriendLocations(users.getValue());
+        radiusIndex--;
+        radius = radii[radiusIndex];
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("Radius", radius);
+        editor.putInt("Index", radiusIndex);
+        editor.apply();
+
+        updateCircles();
+        updateFriendLocations(users.getValue());
+
+        setClickable(findViewById(R.id.zoomOutButton));
+        if (radiusIndex == 0) {
+            setNotClickable(findViewById(R.id.zoomInButton));
         }
     }
 
@@ -254,9 +286,30 @@ public class CompassActivity extends AppCompatActivity {
      * @ensure friend locations on compass are updated according to new radius
      */
     public void onZoomOut(View view) {
-        this.radius *= 2;
+        radiusIndex++;
+        radius = radii[radiusIndex];
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("Radius", radius);
+        editor.putInt("Index", radiusIndex);
+        editor.apply();
+
         updateCircles();
         updateFriendLocations(users.getValue());
+
+        setClickable(findViewById(R.id.zoomInButton));
+        if (radiusIndex == 2) {
+            setNotClickable(findViewById(R.id.zoomOutButton));
+        }
+    }
+
+    public void setClickable(Button button) {
+        button.setClickable(true);
+        button.setBackgroundColor(Color.parseColor("#FF6200EE"));
+    }
+
+    public void setNotClickable(Button button) {
+        button.setClickable(false);
+        button.setBackgroundColor(Color.GRAY);
     }
 
     /**
