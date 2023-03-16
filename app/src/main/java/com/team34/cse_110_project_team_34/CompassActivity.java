@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,7 @@ public class CompassActivity extends AppCompatActivity {
     private String main_private_uid;
     private LiveData<List<User>> users;
     private Map<String, LocationView> locationsViews;
+    private List<ImageView> circleViews;
 
     private double lastMainLat;
     private double lastMainLong;
@@ -75,23 +77,26 @@ public class CompassActivity extends AppCompatActivity {
         main_public_uid = preferences.getString("Public", "");
         main_private_uid = preferences.getString("Private", "");
 
-        //checking when the list of users is being updated
+        // Checking when the list of users is being updated
         LocationViewModel viewModel = setupViewModel();
         users = viewModel.getUsers();
         users.observe(this, this::updateFriendLocations);
         locationsViews = new HashMap<>();
 
+        // Getting the current user's public uid
         TextView public_uid_text = this.findViewById(R.id.public_uid);
         public_uid_text.setText(String.format("%s%s", getString(R.string.publicUIDString), preferences.getString("Public", "")));
 
         // Setting up location/orientation for user
         compass = findViewById(R.id.compass);
         compassLayout = findViewById(R.id.compassLayout);
+        circleViews = new ArrayList<>();
         radius = 20;
 
         lastMainLat = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().first : 0;
         lastMainLong = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().second : 0;
 
+        updateCircles();
         observeLocation();
         observeOrientation();
     }
@@ -107,6 +112,12 @@ public class CompassActivity extends AppCompatActivity {
         locationService.unregisterLocationListener();
     }
 
+    /**
+     * We recalculate each friend's position on our compass, creating LocationViews for them if
+     * they didn't already exist.
+     *
+     * @param users The complete list of friends
+     */
     private void updateFriendLocations(List<User> users) {
         if (users == null) {
             return;
@@ -123,6 +134,12 @@ public class CompassActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Displays a user's location marker on the compass.
+     *
+     * @param user The user whose location we are displaying
+     * @param userView The LocationView object containing the location marker for user
+     */
     public void updateCompassLocation(User user, LocationView userView) {
         float azimuth = compass.getRotation() + Calculation.getAngle(lastMainLat, lastMainLong, user.latitude, user.longitude);
         float distance = Calculation.getDistance(lastMainLat, lastMainLong, user.latitude, user.longitude);
@@ -135,15 +152,55 @@ public class CompassActivity extends AppCompatActivity {
         }
         if (user.public_code.equals(main_public_uid)) {
             compassRadius = 0;
-            userView.nameView.setText("");
         }
 
         ConstraintSet constraintSet = new ConstraintSet();
         constraintSet.clone((ConstraintLayout) findViewById(R.id.mainLayout));
         constraintSet.constrainCircle(userView.itemView.getId(), compassLayout.getId(), compassRadius, azimuth);
         constraintSet.applyTo(findViewById(R.id.mainLayout));
+
+        userView.itemView.bringToFront();
     }
 
+    public void updateCircles() {
+        ConstraintLayout cl = findViewById(R.id.mainLayout);
+
+        for (ImageView circle : circleViews) {
+            cl.removeView(circle);
+        }
+        circleViews.clear();
+
+        int currRadius = 10;
+        while (currRadius <= radius) {
+            drawCircle(currRadius);
+            currRadius *= 2;
+        }
+    }
+
+    public void drawCircle(int circleRadius) {
+        ConstraintLayout cl = findViewById(R.id.mainLayout);
+
+        ImageView circle = new ImageView(this);
+        circle.setId(View.generateViewId());
+        circle.setImageResource(R.drawable.circle_1);
+        cl.addView(circle);
+        circleViews.add(circle);
+
+        ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) circle.getLayoutParams();
+        int trueRadius = (int) (((float) circleRadius / radius) * COMPASS_EDGE);
+        lp.width = (int) (trueRadius * 2);
+        lp.height = (int) (trueRadius * 2);
+        circle.setLayoutParams(lp);
+
+        ConstraintSet cs = new ConstraintSet();
+        cs.clone(cl);
+        cs.constrainCircle(circle.getId(), compassLayout.getId(), 0, 0);
+        cs.applyTo(cl);
+    }
+
+    /**
+     * When our orientation changes, we recalculate friend positions on our compass.
+     */
     public void observeOrientation() {
         orientationService.getOrientation().observe(this, orientation -> {
             float newOrientation = Calculation.getCompassRotation(orientation);
@@ -188,6 +245,7 @@ public class CompassActivity extends AppCompatActivity {
     public void onZoomIn(View view) {
         if (radius >= 20) {
             radius /= 2;
+            updateCircles();
             updateFriendLocations(users.getValue());
         }
     }
@@ -198,9 +256,17 @@ public class CompassActivity extends AppCompatActivity {
      */
     public void onZoomOut(View view) {
         this.radius *= 2;
+        updateCircles();
         updateFriendLocations(users.getValue());
     }
 
+    /**
+     * Creates a new compass marker for a single user.
+     *
+     * @param cl The layout in which we are going to place our inflated view
+     * @param user The user who we are creating a view for
+     * @return The LocationView which was created for user's compass marker
+     */
     public LocationView addLocationView(ConstraintLayout cl, User user) {
         ConstraintLayout inflater = (ConstraintLayout) LayoutInflater.from(this)
                 .inflate(R.layout.location, cl, false);
@@ -208,8 +274,12 @@ public class CompassActivity extends AppCompatActivity {
 
         ConstraintSet set = new ConstraintSet();
         set.clone(inflater);
-        set.connect(userView.nameView.getId(), ConstraintSet.TOP, userView.statusView.getId(), ConstraintSet.BOTTOM);
+        set.connect(userView.statusView.getId(), ConstraintSet.TOP, userView.nameView.getId(), ConstraintSet.BOTTOM);
         set.applyTo(inflater);
+
+        if (user.public_code.equals(main_public_uid)) {
+            inflater.removeView(userView.nameView);
+        }
 
         cl.addView(inflater);
         return userView;
