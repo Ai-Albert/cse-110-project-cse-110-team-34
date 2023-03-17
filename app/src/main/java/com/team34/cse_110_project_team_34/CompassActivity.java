@@ -90,11 +90,11 @@ public class CompassActivity extends AppCompatActivity {
         LocationViewModel viewModel = setupViewModel();
         users = viewModel.getUsers();
         users.observe(this, this::updateFriendLocations);
-//        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-//        executor.scheduleAtFixedRate(() -> {
-//            users = viewModel.getUsers();
-//            updateFriendLocations(users.getValue());
-//        }, 0, 3000, TimeUnit.MILLISECONDS);
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        executor.scheduleAtFixedRate(() -> {
+            users = viewModel.getUsers();
+            updateFriendLocations(users.getValue());
+        }, 0, 3000, TimeUnit.MILLISECONDS);
         locationViews = new HashMap<>();
 
         // Getting the current user's public uid
