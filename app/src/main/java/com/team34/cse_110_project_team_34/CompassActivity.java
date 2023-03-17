@@ -90,11 +90,6 @@ public class CompassActivity extends AppCompatActivity {
         LocationViewModel viewModel = setupViewModel();
         users = viewModel.getUsers();
         users.observe(this, this::updateFriendLocations);
-        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        executor.scheduleAtFixedRate(() -> {
-            users = viewModel.getUsers();
-            updateFriendLocations(users.getValue());
-        }, 0, 3000, TimeUnit.MILLISECONDS);
         locationViews = new HashMap<>();
 
         // Getting the current user's public uid
@@ -148,11 +143,14 @@ public class CompassActivity extends AppCompatActivity {
         ConstraintLayout cl = this.findViewById(R.id.mainLayout);
         for (User user : users) {
             if (!locationViews.containsKey(user.public_code)) {
+                if (!user.public_code.equals(main_public_uid)) {
+                    LiveData<User> toObserve = userRepo.getLocalLive(user.public_code);
+                    toObserve.observe(this, this::updateCompassLocation);
+                }
                 LocationView newLocation = addLocationView(cl, user);
                 locationViews.put(user.public_code, newLocation);
             }
-            LocationView userView = locationViews.get(user.public_code);
-            updateCompassLocation(user, userView);
+            updateCompassLocation(user);
         }
     }
 
@@ -160,9 +158,11 @@ public class CompassActivity extends AppCompatActivity {
      * Displays a user's location marker on the compass.
      *
      * @param user The user whose location we are displaying
-     * @param userView The LocationView object containing the location marker for user
      */
-    public void updateCompassLocation(User user, LocationView userView) {
+    public void updateCompassLocation(User user) {
+        LocationView userView = locationViews.get(user.public_code);
+        assert userView != null;
+
         float azimuth = compass.getRotation() + Calculation.getAngle(lastMainLat, lastMainLong, user.latitude, user.longitude);
         float distance = Calculation.getDistance(lastMainLat, lastMainLong, user.latitude, user.longitude);
         int compassRadius = (int) (distance / radius * COMPASS_EDGE);
@@ -274,7 +274,9 @@ public class CompassActivity extends AppCompatActivity {
      * @ensure friend locations on compass are updated according to new radius
      */
     public void onZoomIn(View view) {
-        radiusIndex--;
+        if (radiusIndex > 0) {
+            radiusIndex--;
+        }
         radius = radii[radiusIndex];
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("Radius", radius);
@@ -295,7 +297,9 @@ public class CompassActivity extends AppCompatActivity {
      * @ensure friend locations on compass are updated according to new radius
      */
     public void onZoomOut(View view) {
-        radiusIndex++;
+        if (radiusIndex < 3) {
+            radiusIndex++;
+        }
         radius = radii[radiusIndex];
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("Radius", radius);

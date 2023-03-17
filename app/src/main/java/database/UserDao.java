@@ -23,6 +23,9 @@ public interface UserDao {
     public abstract boolean exists(String public_code);
 
     @Query("SELECT * FROM User WHERE public_code = :public_code")
+    public abstract LiveData<User> getLive(String public_code);
+
+    @Query("SELECT * FROM User WHERE public_code = :public_code")
     public abstract User get(String public_code);
 
     @Query("SELECT * FROM User ORDER BY name")
