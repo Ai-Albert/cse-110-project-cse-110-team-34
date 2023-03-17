@@ -18,9 +18,10 @@ import model.User;
 public class UserRepository {
     private final UserDao dao;
     private final UserAPI api;
-    private final MutableLiveData<User> realLiveContent;
 
     private final MediatorLiveData<User> liveContent;
+
+    private final MutableLiveData<User> realLiveContent;
 
     private ScheduledFuture<?> clockFuture;
 
@@ -53,7 +54,10 @@ public class UserRepository {
 
         Observer<User> updateFromRemote = theirUser -> {
             User ourUser = user.getValue();
-            if (theirUser == null) return; // do nothing
+            if (theirUser == null) {
+                System.out.println("theirUser is null");
+                return; // do nothing
+            }
             if (ourUser == null) {
                 upsertLocal(theirUser);
             }
@@ -125,6 +129,8 @@ public class UserRepository {
                 upsertLocal(user);
             }
         }
+
+        MutableLiveData<User> realLiveContent = new MutableLiveData<User>();
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         clockFuture = executor.scheduleAtFixedRate(() -> {
             User temp = api.get(public_code);
@@ -132,7 +138,7 @@ public class UserRepository {
                 realLiveContent.postValue(temp);
             }
         }, 0, 3, TimeUnit.SECONDS);
-        return liveContent;
+        return realLiveContent;
     }
 
     public void upsertRemote(String private_code, User user) {

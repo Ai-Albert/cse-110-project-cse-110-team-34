@@ -40,10 +40,12 @@ public class CompassActivity extends AppCompatActivity {
     private OrientationService orientationService;
     private LocationService locationService;
     SharedPreferences preferences;
+    private LocationViewModel viewModel;
 
     private String main_public_uid;
     private String main_private_uid;
     private LiveData<List<User>> users;
+    private List<LiveData<User>> userDatas;
     @VisibleForTesting
     public Map<String, LocationView> locationViews;
     private List<ImageView> circleViews;
@@ -64,10 +66,6 @@ public class CompassActivity extends AppCompatActivity {
     // screen width/height used for UI element layout
     public static int getScreenWidth() {
         return Resources.getSystem().getDisplayMetrics().widthPixels;
-    }
-
-    public static int getScreenHeight() {
-        return Resources.getSystem().getDisplayMetrics().heightPixels;
     }
 
     @Override
@@ -104,9 +102,10 @@ public class CompassActivity extends AppCompatActivity {
         radius = 20;
 
         // Checking when the list of users is being updated
-        LocationViewModel viewModel = setupViewModel();
+        viewModel = setupViewModel();
         users = viewModel.getUsers();
         users.observe(this, this::updateFriendLocations);
+        userDatas = new ArrayList<>();
         locationViews = new HashMap<>();
 
         // Setting up compass
@@ -131,8 +130,30 @@ public class CompassActivity extends AppCompatActivity {
         observeOrientation();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setupObservers();
+    }
+
     private LocationViewModel setupViewModel() {
         return new ViewModelProvider(this).get(LocationViewModel.class);
+    }
+
+    private void setupObservers() {
+        List<User> usersList = users.getValue();
+        if (usersList == null) {
+            return;
+        }
+        System.out.println("SETTING UP");
+        for (User user : usersList) {
+            if (user.public_code.equals(main_public_uid)) {
+                continue;
+            }
+            LiveData<User> liveUser = userRepo.getSynced(user.public_code);
+            userDatas.add(liveUser);
+            liveUser.observe(this, this::updateCompassLocation);
+        }
     }
 
     @Override
@@ -156,10 +177,6 @@ public class CompassActivity extends AppCompatActivity {
         ConstraintLayout cl = this.findViewById(R.id.mainLayout);
         for (User user : users) {
             if (!locationViews.containsKey(user.public_code)) {
-                if (!user.public_code.equals(main_public_uid)) {
-                    LiveData<User> toObserve = userRepo.getLocalLive(user.public_code);
-                    toObserve.observe(this, this::updateCompassLocation);
-                }
                 LocationView newLocation = addLocationView(cl, user);
                 locationViews.put(user.public_code, newLocation);
             }
@@ -284,7 +301,7 @@ public class CompassActivity extends AppCompatActivity {
                 lastMainLat = location.first;
                 lastMainLong = location.second;
 
-                User mainUser = userRepo.getLocal(main_public_uid);
+                User mainUser = viewModel.getUser(main_public_uid);
                 mainUser.setLatitude(lastMainLat);
                 mainUser.setLongitude(lastMainLong);
 
