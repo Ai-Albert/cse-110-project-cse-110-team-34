@@ -32,6 +32,9 @@ public interface UserDao {
     public abstract LiveData<List<User>> getAll();
 
     @Query("SELECT * FROM User ORDER BY name")
+    public abstract List<User> getAllList();
+    
+    @Query("SELECT * FROM User ORDER BY name")
     public abstract List<User> getAllNotLive();
 
     @Delete
