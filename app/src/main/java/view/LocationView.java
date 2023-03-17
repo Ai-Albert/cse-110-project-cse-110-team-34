@@ -4,14 +4,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-
 import com.team34.cse_110_project_team_34.R;
-
 
 import java.time.Instant;
 
 import model.User;
-
 
 public class LocationView {
 
@@ -26,6 +23,10 @@ public class LocationView {
         this.nameView = itemView.findViewById(R.id.location_name);
         this.statusView = itemView.findViewById(R.id.indicator);
         this.timeView = itemView.findViewById(R.id.last_live);
+
+        this.itemView.setId(View.generateViewId());
+        this.nameView.setId(View.generateViewId());
+        this.statusView.setId(View.generateViewId());
 
         update(user);
     }

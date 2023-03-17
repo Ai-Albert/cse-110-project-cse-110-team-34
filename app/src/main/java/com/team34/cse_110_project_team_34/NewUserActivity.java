@@ -60,6 +60,8 @@ public class NewUserActivity extends AppCompatActivity {
         editor.putString("Public", public_code);
         editor.apply();
 
+        System.out.println(public_code);
+
         Intent intent = new Intent(this, CompassActivity.class);
         startActivity(intent);
     }

@@ -33,4 +33,16 @@ public class LocationViewModel extends AndroidViewModel {
         }
         return users;
     }
+
+    public List<User> getUsersNotLive() {
+        return repo.getAllLocalNotLive();
+    }
+
+    public LiveData<User> getUser(String public_uid) {
+        return repo.getLocal(public_uid);
+    }
+
+    public User getUserNotLive(String public_uid) {
+        return repo.getLocalNotLive(public_uid);
+    }
 }
