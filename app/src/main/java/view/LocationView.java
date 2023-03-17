@@ -6,6 +6,8 @@ import android.widget.TextView;
 
 import com.team34.cse_110_project_team_34.R;
 
+import org.w3c.dom.Text;
+
 import java.time.Instant;
 
 import model.User;
@@ -24,10 +26,6 @@ public class LocationView {
         this.statusView = itemView.findViewById(R.id.indicator);
         this.timeView = itemView.findViewById(R.id.last_live);
 
-        this.itemView.setId(View.generateViewId());
-        this.nameView.setId(View.generateViewId());
-        this.statusView.setId(View.generateViewId());
-
         update(user);
     }
 
@@ -35,9 +33,13 @@ public class LocationView {
         nameView.setText(user.getName());
         if (user.getLastUpdated() + 60 >= Instant.now().getEpochSecond()) {
             statusView.setImageResource(R.drawable.green_indicator);
+
+            statusView.setTag(R.drawable.green_indicator);
             timeView.setVisibility(View.INVISIBLE);
         } else {
             statusView.setImageResource(R.drawable.red_indicator);
+            statusView.setTag(R.drawable.red_indicator);
+
             long seconds_since_seen = Instant.now().getEpochSecond() - user.getLastUpdated();
             if (seconds_since_seen < 3600) {
                 timeView.setText(seconds_since_seen / 60 + "m");

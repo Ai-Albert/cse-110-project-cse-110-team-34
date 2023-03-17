@@ -83,6 +83,8 @@ public class User {
         return version;
     }
 
+    public void setLastUpdated(long version) { this.version = version; }
+
     public static User fromJSON(String json) {
         return new Gson().fromJson(json, User.class);
     }

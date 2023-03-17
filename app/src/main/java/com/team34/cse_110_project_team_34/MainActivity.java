@@ -25,17 +25,18 @@ public class MainActivity extends AppCompatActivity {
 
         dao = Database.getInstance(this).getUserDao();
         // TODO: Remove this during demo
-        Database.getInstance(this).clearAllTables();
+//        Database.getInstance(this).clearAllTables();
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
         ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
         }
         SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
-         SharedPreferences.Editor editor = preferences.edit();
-         // TODO: Remove this during demo
-         editor.clear();
-         editor.apply();
+
+        SharedPreferences.Editor editor = preferences.edit();
+        // TODO: Remove this during demo
+//        editor.clear();
+//        editor.apply();
 
         if (!preferences.contains("Private")) {
             Intent intent = new Intent(this, NewUserActivity.class);

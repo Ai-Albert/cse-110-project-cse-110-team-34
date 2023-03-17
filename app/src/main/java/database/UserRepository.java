@@ -80,6 +80,7 @@ public class UserRepository {
     }
 
     public void updateSynced(String private_code, User user) {
+        Log.d("Syncing", "test");
         updateLocal(user);
         upsertRemote(private_code, user);
     }
