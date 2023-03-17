@@ -30,5 +30,16 @@
         app:layout_constraintTop_toBottomOf="@id/location_name"
         app:srcCompat="@drawable/green_indicator" />
 
+    <TextView
+        android:id="@+id/last_live"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:ellipsize="end"
+        android:hint="Last Live"
+        android:maxLines="1"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@id/location_name"
+        app:layout_constraintTop_toBottomOf="@id/indicator" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

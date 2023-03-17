@@ -2,6 +2,7 @@ package com.team34.cse_110_project_team_34;
 
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
+
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.lifecycle.LiveData;
@@ -22,11 +23,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import database.Database;
+import database.UserDao;
 import database.UserRepository;
 import model.User;
 import utilities.Calculation;
@@ -77,7 +76,6 @@ public class CompassActivity extends AppCompatActivity {
         setContentView(R.layout.activity_compass);
 
         // Setting up services
-        userRepo = new UserRepository(Database.getInstance(this).getUserDao());
         orientationService = OrientationService.getInstance(this);
         locationService = LocationService.getInstance(this);
 
@@ -86,15 +84,30 @@ public class CompassActivity extends AppCompatActivity {
         main_public_uid = preferences.getString("Public", "");
         main_private_uid = preferences.getString("Private", "");
 
+        // API mocking
+        UserDao dao = Database.getInstance(this).getUserDao();
+        String link = preferences.getString("API_Link", "");
+        if (link.equals("")) {
+            userRepo = new UserRepository(dao);
+        } else {
+            userRepo = new UserRepository(dao, link);
+        }
+
+        // Getting the current user's public uid
+        TextView public_uid_text = this.findViewById(R.id.public_uid);
+        public_uid_text.setText(String.format("%s%s", getString(R.string.publicUIDString), preferences.getString("Public", "")));
+
+        // Setting up location/orientation for user
+        compass = findViewById(R.id.compass);
+        compassLayout = findViewById(R.id.compassLayout);
+        circleViews = new ArrayList<>();
+        radius = 20;
+
         // Checking when the list of users is being updated
         LocationViewModel viewModel = setupViewModel();
         users = viewModel.getUsers();
         users.observe(this, this::updateFriendLocations);
         locationViews = new HashMap<>();
-
-        // Getting the current user's public uid
-        TextView public_uid_text = this.findViewById(R.id.public_uid);
-        public_uid_text.setText(String.format("%s%s", getString(R.string.publicUIDString), preferences.getString("Public", "")));
 
         // Setting up compass
         compass = findViewById(R.id.compass);
@@ -150,6 +163,7 @@ public class CompassActivity extends AppCompatActivity {
                 LocationView newLocation = addLocationView(cl, user);
                 locationViews.put(user.public_code, newLocation);
             }
+            locationViews.get(user.public_code).update(user);
             updateCompassLocation(user);
         }
     }

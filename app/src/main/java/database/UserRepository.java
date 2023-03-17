@@ -1,5 +1,7 @@
 package database;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -26,6 +28,16 @@ public class UserRepository {
         this.dao = dao;
 
         api = new UserAPI();
+        realLiveContent = new MediatorLiveData<>();
+
+        liveContent = new MediatorLiveData<>();
+        liveContent.addSource(realLiveContent, liveContent::postValue);
+    }
+
+    public UserRepository(UserDao dao, String new_link) {
+        this.dao = dao;
+
+        api = new UserAPI(new_link);
         realLiveContent = new MediatorLiveData<>();
 
         liveContent = new MediatorLiveData<>();
