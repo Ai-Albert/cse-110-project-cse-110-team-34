@@ -1,5 +1,7 @@
 package database;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -16,9 +18,10 @@ import model.User;
 public class UserRepository {
     private final UserDao dao;
     private final UserAPI api;
-    private final MutableLiveData<User> realLiveContent;
 
     private final MediatorLiveData<User> liveContent;
+
+    private final MutableLiveData<User> realLiveContent;
 
     private ScheduledFuture<?> clockFuture;
 
@@ -26,6 +29,16 @@ public class UserRepository {
         this.dao = dao;
 
         api = new UserAPI();
+        realLiveContent = new MediatorLiveData<>();
+
+        liveContent = new MediatorLiveData<>();
+        liveContent.addSource(realLiveContent, liveContent::postValue);
+    }
+
+    public UserRepository(UserDao dao, String new_link) {
+        this.dao = dao;
+
+        api = new UserAPI(new_link);
         realLiveContent = new MediatorLiveData<>();
 
         liveContent = new MediatorLiveData<>();
@@ -41,7 +54,10 @@ public class UserRepository {
 
         Observer<User> updateFromRemote = theirUser -> {
             User ourUser = user.getValue();
-            if (theirUser == null) return; // do nothing
+            if (theirUser == null) {
+                System.out.println("theirUser is null");
+                return; // do nothing
+            }
             if (ourUser == null) {
                 upsertLocal(theirUser);
             }
@@ -64,6 +80,7 @@ public class UserRepository {
     }
 
     public void updateSynced(String private_code, User user) {
+        Log.d("Syncing", "test");
         updateLocal(user);
         upsertRemote(private_code, user);
     }
@@ -72,12 +89,20 @@ public class UserRepository {
         dao.update(user);
     }
 
-    public User getLocal(String public_code) {
+    public LiveData<User> getLocal(String public_code) {
         return dao.get(public_code);
+    }
+
+    public User getLocalNotLive(String public_code) {
+        return dao.getNotLive(public_code);
     }
 
     public LiveData<List<User>> getAllLocal() {
         return dao.getAll();
+    }
+
+    public List<User> getAllLocalNotLive() {
+        return dao.getAllNotLive();
     }
 
     public void upsertLocal(User user) {
@@ -109,6 +134,8 @@ public class UserRepository {
                 upsertLocal(user);
             }
         }
+
+        MutableLiveData<User> realLiveContent = new MutableLiveData<User>();
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         clockFuture = executor.scheduleAtFixedRate(() -> {
             User temp = api.get(public_code);
@@ -116,7 +143,7 @@ public class UserRepository {
                 realLiveContent.postValue(temp);
             }
         }, 0, 3, TimeUnit.SECONDS);
-        return liveContent;
+        return realLiveContent;
     }
 
     public void upsertRemote(String private_code, User user) {

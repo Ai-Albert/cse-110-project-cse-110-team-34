@@ -2,6 +2,7 @@ package com.team34.cse_110_project_team_34;
 
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
+
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.lifecycle.LiveData;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import database.Database;
+import database.UserDao;
 import database.UserRepository;
 import model.User;
 import utilities.Calculation;
@@ -38,10 +40,13 @@ public class CompassActivity extends AppCompatActivity {
     private OrientationService orientationService;
     private LocationService locationService;
     SharedPreferences preferences;
+    private LocationViewModel viewModel;
 
     private String main_public_uid;
     private String main_private_uid;
     private LiveData<List<User>> users;
+    private List<User> usersList;
+    private List<LiveData<User>> userDatas;
     @VisibleForTesting
     public Map<String, LocationView> locationViews;
     private List<ImageView> circleViews;
@@ -51,7 +56,7 @@ public class CompassActivity extends AppCompatActivity {
 
     @VisibleForTesting
     public int radius; // Miles
-    public final int[] radii = {1, 10, 500, Integer.MAX_VALUE};
+    public final int[] radii = {0, 1, 10, 500, Integer.MAX_VALUE};
     public int radiusIndex;
 
     private final double COMPASS_EDGE = (getScreenWidth() - 32) / 2.0;
@@ -64,17 +69,12 @@ public class CompassActivity extends AppCompatActivity {
         return Resources.getSystem().getDisplayMetrics().widthPixels;
     }
 
-    public static int getScreenHeight() {
-        return Resources.getSystem().getDisplayMetrics().heightPixels;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compass);
 
         // Setting up services
-        userRepo = new UserRepository(Database.getInstance(this).getUserDao());
         orientationService = OrientationService.getInstance(this);
         locationService = LocationService.getInstance(this);
 
@@ -83,26 +83,43 @@ public class CompassActivity extends AppCompatActivity {
         main_public_uid = preferences.getString("Public", "");
         main_private_uid = preferences.getString("Private", "");
 
-        // Checking when the list of users is being updated
-        LocationViewModel viewModel = setupViewModel();
-        users = viewModel.getUsers();
-        users.observe(this, this::updateFriendLocations);
-        locationViews = new HashMap<>();
+        // API mocking
+        UserDao dao = Database.getInstance(this).getUserDao();
+        String link = preferences.getString("API_Link", "");
+        if (link.equals("")) {
+            userRepo = new UserRepository(dao);
+        } else {
+            userRepo = new UserRepository(dao, link);
+        }
 
         // Getting the current user's public uid
         TextView public_uid_text = this.findViewById(R.id.public_uid);
         public_uid_text.setText(String.format("%s%s", getString(R.string.publicUIDString), preferences.getString("Public", "")));
+
+        // Setting up location/orientation for user
+        compass = findViewById(R.id.compass);
+        compassLayout = findViewById(R.id.compassLayout);
+        circleViews = new ArrayList<>();
+        radius = 20;
+
+        // Checking when the list of users is being updated
+        viewModel = setupViewModel();
+        users = viewModel.getUsers();
+        users.observe(this, this::updateFriendLocations);
+        usersList = viewModel.getUsersNotLive();
+        userDatas = new ArrayList<>();
+        locationViews = new HashMap<>();
 
         // Setting up compass
         compass = findViewById(R.id.compass);
         compassLayout = findViewById(R.id.compassLayout);
         circleViews = new ArrayList<>();
         radius = preferences.getInt("Radius", 10);
-        radiusIndex = preferences.getInt("Index", 1);
+        radiusIndex = preferences.getInt("Index", 2);
         if (radiusIndex == 0) {
             setNotClickable(findViewById(R.id.zoomInButton));
         }
-        else if (radiusIndex == 2) {
+        else if (radiusIndex == 4) {
             setNotClickable(findViewById(R.id.zoomOutButton));
         }
 
@@ -110,13 +127,31 @@ public class CompassActivity extends AppCompatActivity {
         lastMainLat = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().first : 0;
         lastMainLong = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().second : 0;
 
+        setupObservers();
         updateCircles();
         observeLocation();
         observeOrientation();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setupObservers();
+    }
+
     private LocationViewModel setupViewModel() {
         return new ViewModelProvider(this).get(LocationViewModel.class);
+    }
+
+    private void setupObservers() {
+        for (User user : usersList) {
+            if (user.public_code.equals(main_public_uid)) {
+                continue;
+            }
+            LiveData<User> liveUser = userRepo.getSynced(user.public_code);
+            userDatas.add(liveUser);
+            liveUser.observe(this, this::updateCompassLocation);
+        }
     }
 
     @Override
@@ -143,8 +178,8 @@ public class CompassActivity extends AppCompatActivity {
                 LocationView newLocation = addLocationView(cl, user);
                 locationViews.put(user.public_code, newLocation);
             }
-            LocationView userView = locationViews.get(user.public_code);
-            updateCompassLocation(user, userView);
+            locationViews.get(user.public_code).update(user);
+            updateCompassLocation(user);
         }
     }
 
@@ -152,27 +187,46 @@ public class CompassActivity extends AppCompatActivity {
      * Displays a user's location marker on the compass.
      *
      * @param user The user whose location we are displaying
-     * @param userView The LocationView object containing the location marker for user
      */
-    public void updateCompassLocation(User user, LocationView userView) {
-        float azimuth = compass.getRotation() + Calculation.getAngle(lastMainLat, lastMainLong, user.latitude, user.longitude);
-        float distance = Calculation.getDistance(lastMainLat, lastMainLong, user.latitude, user.longitude);
-        int compassRadius = (int) (distance / radius * COMPASS_EDGE);
+    public void updateCompassLocation(User user) {
+        LocationView userView = locationViews.get(user.public_code);
+        assert userView != null;
 
+        // Getting angle
+        float azimuth = compass.getRotation() + Calculation.getAngle(lastMainLat, lastMainLong, user.latitude, user.longitude);
+
+        // Getting radius
+        float distance = Calculation.getDistance(lastMainLat, lastMainLong, user.latitude, user.longitude);
+        int lowerIndex = 0;
+        for (int i = 1; i < 5; i++) {
+            if (distance >= radii[i]) {
+                lowerIndex = i;
+            }
+        }
+
+        int compassRadius = 0;
         userView.nameView.setText(user.name);
-        if (compassRadius > COMPASS_EDGE) {
+        if (lowerIndex >= radiusIndex) {
             compassRadius = (int) COMPASS_EDGE;
             userView.nameView.setText("");
         }
-        if (user.public_code.equals(main_public_uid)) {
-            compassRadius = 0;
+        else {
+            int lowerRadius = lowerIndex == 0 ? 0 : ((ConstraintLayout.LayoutParams) circleViews.get(lowerIndex - 1).getLayoutParams()).width / 2;
+            int upperRadius = ((ConstraintLayout.LayoutParams) circleViews.get(lowerIndex).getLayoutParams()).width / 2;
+            compassRadius = (lowerRadius - upperRadius) / 2 + upperRadius;
         }
 
+        // Checking for main user
+        if (user.public_code.equals(main_public_uid)) {
+            compassRadius = -30;
+            azimuth = 0;
+        }
+
+        // Setting new constraint based on angle and radius
         ConstraintSet constraintSet = new ConstraintSet();
         constraintSet.clone((ConstraintLayout) findViewById(R.id.mainLayout));
         constraintSet.constrainCircle(userView.itemView.getId(), compassLayout.getId(), compassRadius, azimuth);
         constraintSet.applyTo(findViewById(R.id.mainLayout));
-
         userView.itemView.bringToFront();
     }
 
@@ -187,9 +241,9 @@ public class CompassActivity extends AppCompatActivity {
         }
         circleViews.clear();
 
-        int currIndex = 0;
+        int currIndex = 1;
         while (currIndex <= radiusIndex) {
-            drawCircle(currIndex + 1, radiusIndex + 1);
+            drawCircle(currIndex, radiusIndex);
             currIndex++;
         }
     }
@@ -245,7 +299,7 @@ public class CompassActivity extends AppCompatActivity {
                 lastMainLat = location.first;
                 lastMainLong = location.second;
 
-                User mainUser = userRepo.getLocal(main_public_uid);
+                User mainUser = viewModel.getUserNotLive(main_public_uid);
                 mainUser.setLatitude(lastMainLat);
                 mainUser.setLongitude(lastMainLong);
 
@@ -261,12 +315,12 @@ public class CompassActivity extends AppCompatActivity {
     }
 
     /**
-     * @require radius > 5
-     * @ensure radius = radius@pre - 5
      * @ensure friend locations on compass are updated according to new radius
      */
     public void onZoomIn(View view) {
-        radiusIndex--;
+        if (radiusIndex > 1) {
+            radiusIndex--;
+        }
         radius = radii[radiusIndex];
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("Radius", radius);
@@ -277,17 +331,18 @@ public class CompassActivity extends AppCompatActivity {
         updateFriendLocations(users.getValue());
 
         setClickable(findViewById(R.id.zoomOutButton));
-        if (radiusIndex == 0) {
+        if (radiusIndex == 1) {
             setNotClickable(findViewById(R.id.zoomInButton));
         }
     }
 
     /**
-     * @ensure radius = radius@pre + 5
      * @ensure friend locations on compass are updated according to new radius
      */
     public void onZoomOut(View view) {
-        radiusIndex++;
+        if (radiusIndex < 4) {
+            radiusIndex++;
+        }
         radius = radii[radiusIndex];
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("Radius", radius);
@@ -298,7 +353,7 @@ public class CompassActivity extends AppCompatActivity {
         updateFriendLocations(users.getValue());
 
         setClickable(findViewById(R.id.zoomInButton));
-        if (radiusIndex == 3) {
+        if (radiusIndex == 4) {
             setNotClickable(findViewById(R.id.zoomOutButton));
         }
     }
@@ -329,6 +384,7 @@ public class CompassActivity extends AppCompatActivity {
         ConstraintSet set = new ConstraintSet();
         set.clone(inflater);
         set.connect(userView.statusView.getId(), ConstraintSet.TOP, userView.nameView.getId(), ConstraintSet.BOTTOM);
+        set.connect(userView.timeView.getId(), ConstraintSet.TOP, userView.statusView.getId(), ConstraintSet.BOTTOM);
         set.applyTo(inflater);
 
         if (user.public_code.equals(main_public_uid)) {
