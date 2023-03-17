@@ -34,6 +34,16 @@ public class UserRepository {
         liveContent.addSource(realLiveContent, liveContent::postValue);
     }
 
+    public UserRepository(UserDao dao, String new_link) {
+        this.dao = dao;
+
+        api = new UserAPI(new_link);
+        realLiveContent = new MediatorLiveData<>();
+
+        liveContent = new MediatorLiveData<>();
+        liveContent.addSource(realLiveContent, liveContent::postValue);
+    }
+
     /**
      * Gets the latest data from either the local database or remotely, whichever was
      * more recently updated.

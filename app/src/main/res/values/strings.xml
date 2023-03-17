@@ -12,5 +12,7 @@
     <string name="zoom_out">Zoom Out</string>
     <string name="zoom_in">Zoom In</string>
     <string name="added">\"Successfully added \"</string>
+    <string name="api_link">API Link</string>
+    <string name="save">Save</string>
     <string name="publicUIDString">\"Public UID: \"</string>
 </resources>
