@@ -53,7 +53,7 @@ public class CompassActivity extends AppCompatActivity {
 
     @VisibleForTesting
     public int radius; // Miles
-    public final int[] radii = {1, 10, 500, Integer.MAX_VALUE};
+    public final int[] radii = {0, 1, 10, 500, Integer.MAX_VALUE};
     public int radiusIndex;
 
     private final double COMPASS_EDGE = (getScreenWidth() - 32) / 2.0;
@@ -114,11 +114,11 @@ public class CompassActivity extends AppCompatActivity {
         compassLayout = findViewById(R.id.compassLayout);
         circleViews = new ArrayList<>();
         radius = preferences.getInt("Radius", 10);
-        radiusIndex = preferences.getInt("Index", 1);
+        radiusIndex = preferences.getInt("Index", 2);
         if (radiusIndex == 0) {
             setNotClickable(findViewById(R.id.zoomInButton));
         }
-        else if (radiusIndex == 3) {
+        else if (radiusIndex == 4) {
             setNotClickable(findViewById(R.id.zoomOutButton));
         }
 
@@ -179,26 +179,39 @@ public class CompassActivity extends AppCompatActivity {
 
         // Getting angle
         float azimuth = compass.getRotation() + Calculation.getAngle(lastMainLat, lastMainLong, user.latitude, user.longitude);
-        float distance = Calculation.getDistance(lastMainLat, lastMainLong, user.latitude, user.longitude);
 
         // Getting radius
-        int compassRadius = (int) (distance / radius * COMPASS_EDGE);
+        float distance = Calculation.getDistance(lastMainLat, lastMainLong, user.latitude, user.longitude);
+        int lowerIndex = 0;
+        for (int i = 1; i < 5; i++) {
+            if (distance >= radii[i]) {
+                lowerIndex = i;
+            }
+        }
 
+        int compassRadius = 0;
         userView.nameView.setText(user.name);
-        if (compassRadius > COMPASS_EDGE) {
+        if (lowerIndex >= radiusIndex) {
             compassRadius = (int) COMPASS_EDGE;
             userView.nameView.setText("");
         }
-        if (user.public_code.equals(main_public_uid)) {
-            compassRadius = 15;
-            azimuth = 180;
+        else {
+            int lowerRadius = lowerIndex == 0 ? 0 : ((ConstraintLayout.LayoutParams) circleViews.get(lowerIndex - 1).getLayoutParams()).width / 2;
+            int upperRadius = ((ConstraintLayout.LayoutParams) circleViews.get(lowerIndex).getLayoutParams()).width / 2;
+            compassRadius = (lowerRadius - upperRadius) / 2 + upperRadius;
         }
 
+        // Checking for main user
+        if (user.public_code.equals(main_public_uid)) {
+            compassRadius = -30;
+            azimuth = 0;
+        }
+
+        // Setting new constraint based on angle and radius
         ConstraintSet constraintSet = new ConstraintSet();
         constraintSet.clone((ConstraintLayout) findViewById(R.id.mainLayout));
         constraintSet.constrainCircle(userView.itemView.getId(), compassLayout.getId(), compassRadius, azimuth);
         constraintSet.applyTo(findViewById(R.id.mainLayout));
-
         userView.itemView.bringToFront();
     }
 
@@ -213,9 +226,9 @@ public class CompassActivity extends AppCompatActivity {
         }
         circleViews.clear();
 
-        int currIndex = 0;
+        int currIndex = 1;
         while (currIndex <= radiusIndex) {
-            drawCircle(currIndex + 1, radiusIndex + 1);
+            drawCircle(currIndex, radiusIndex);
             currIndex++;
         }
     }
@@ -287,12 +300,10 @@ public class CompassActivity extends AppCompatActivity {
     }
 
     /**
-     * @require radius > 5
-     * @ensure radius = radius@pre - 5
      * @ensure friend locations on compass are updated according to new radius
      */
     public void onZoomIn(View view) {
-        if (radiusIndex > 0) {
+        if (radiusIndex > 1) {
             radiusIndex--;
         }
         radius = radii[radiusIndex];
@@ -305,17 +316,16 @@ public class CompassActivity extends AppCompatActivity {
         updateFriendLocations(users.getValue());
 
         setClickable(findViewById(R.id.zoomOutButton));
-        if (radiusIndex == 0) {
+        if (radiusIndex == 1) {
             setNotClickable(findViewById(R.id.zoomInButton));
         }
     }
 
     /**
-     * @ensure radius = radius@pre + 5
      * @ensure friend locations on compass are updated according to new radius
      */
     public void onZoomOut(View view) {
-        if (radiusIndex < 3) {
+        if (radiusIndex < 4) {
             radiusIndex++;
         }
         radius = radii[radiusIndex];
@@ -328,7 +338,7 @@ public class CompassActivity extends AppCompatActivity {
         updateFriendLocations(users.getValue());
 
         setClickable(findViewById(R.id.zoomInButton));
-        if (radiusIndex == 3) {
+        if (radiusIndex == 4) {
             setNotClickable(findViewById(R.id.zoomOutButton));
         }
     }
@@ -359,6 +369,7 @@ public class CompassActivity extends AppCompatActivity {
         ConstraintSet set = new ConstraintSet();
         set.clone(inflater);
         set.connect(userView.statusView.getId(), ConstraintSet.TOP, userView.nameView.getId(), ConstraintSet.BOTTOM);
+        set.connect(userView.timeView.getId(), ConstraintSet.TOP, userView.statusView.getId(), ConstraintSet.BOTTOM);
         set.applyTo(inflater);
 
         if (user.public_code.equals(main_public_uid)) {
