@@ -299,4 +299,7 @@ public class CompassActivity extends AppCompatActivity {
         cl.addView(inflater);
         return userView;
     }
+    public Map<String, LocationView> getLocationsViews() {
+        return locationsViews;
+    }
 }
