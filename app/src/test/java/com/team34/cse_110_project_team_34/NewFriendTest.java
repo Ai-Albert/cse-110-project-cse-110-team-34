@@ -74,9 +74,9 @@ public class NewFriendTest {
         scenario.onActivity(activity -> {
             EditText code = activity.findViewById(R.id.public_code);
             Button submit = activity.findViewById(R.id.submit_new_friend);
-            code.setText("point-nemo");
+            code.setText("testing-testing-123");
             submit.performClick();
-            assertEquals(repo.existsLocal("point-nemo"), true);
+            assertEquals(repo.existsLocal("testing-testing-123"), true);
         });
     }
 
@@ -96,7 +96,7 @@ public class NewFriendTest {
         ActivityScenario<CompassActivity> new_scenario = ActivityScenario.launch(CompassActivity.class);;
         new_scenario.onActivity(activity -> {
             Map<String, LocationView> location_views = activity.locationViews;
-            assertEquals(location_views.size(), 3);
+            assertEquals(location_views.size(), 4);
             assertNotNull(location_views.get("pub_1"));
             assertNotNull(location_views.get("pub_2"));
             assertNotNull(location_views.get("pub_3"));
