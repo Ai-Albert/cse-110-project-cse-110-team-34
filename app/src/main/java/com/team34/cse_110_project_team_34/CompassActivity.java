@@ -394,5 +394,4 @@ public class CompassActivity extends AppCompatActivity {
         cl.addView(inflater);
         return userView;
     }
-
 }
