@@ -177,8 +177,11 @@ public class CompassActivity extends AppCompatActivity {
         LocationView userView = locationViews.get(user.public_code);
         assert userView != null;
 
+        // Getting angle
         float azimuth = compass.getRotation() + Calculation.getAngle(lastMainLat, lastMainLong, user.latitude, user.longitude);
         float distance = Calculation.getDistance(lastMainLat, lastMainLong, user.latitude, user.longitude);
+
+        // Getting radius
         int compassRadius = (int) (distance / radius * COMPASS_EDGE);
 
         userView.nameView.setText(user.name);
@@ -187,7 +190,8 @@ public class CompassActivity extends AppCompatActivity {
             userView.nameView.setText("");
         }
         if (user.public_code.equals(main_public_uid)) {
-            compassRadius = 0;
+            compassRadius = 15;
+            azimuth = 180;
         }
 
         ConstraintSet constraintSet = new ConstraintSet();

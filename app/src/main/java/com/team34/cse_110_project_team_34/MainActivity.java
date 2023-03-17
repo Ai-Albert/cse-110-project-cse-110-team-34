@@ -34,8 +34,8 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         // TODO: Remove this during demo
-//        editor.clear();
-//        editor.apply();
+        editor.clear();
+        editor.apply();
 
         if (!preferences.contains("Private")) {
             Intent intent = new Intent(this, NewUserActivity.class);
