@@ -56,11 +56,11 @@ public class DatabaseTest {
         userDao.upsert(u3);
 
 
-        User db1 = userDao.get("public1");
+        User db1 = userDao.getNotLive("public1");
         assertTrue(db1.equals(u1));
-        User db2 = userDao.get("public2");
+        User db2 = userDao.getNotLive("public2");
         assertTrue(db2.equals(u2));
-        User db3 = userDao.get("public3");
+        User db3 = userDao.getNotLive("public3");
         assertTrue(db3.equals(u3));
     }
 }
