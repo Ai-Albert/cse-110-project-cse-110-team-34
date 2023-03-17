@@ -45,6 +45,7 @@ public class CompassActivity extends AppCompatActivity {
     private String main_public_uid;
     private String main_private_uid;
     private LiveData<List<User>> users;
+    private List<User> usersList;
     private List<LiveData<User>> userDatas;
     @VisibleForTesting
     public Map<String, LocationView> locationViews;
@@ -105,6 +106,7 @@ public class CompassActivity extends AppCompatActivity {
         viewModel = setupViewModel();
         users = viewModel.getUsers();
         users.observe(this, this::updateFriendLocations);
+        usersList = viewModel.getUsersNotLive();
         userDatas = new ArrayList<>();
         locationViews = new HashMap<>();
 
@@ -125,6 +127,7 @@ public class CompassActivity extends AppCompatActivity {
         lastMainLat = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().first : 0;
         lastMainLong = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().second : 0;
 
+        setupObservers();
         updateCircles();
         observeLocation();
         observeOrientation();
@@ -141,11 +144,6 @@ public class CompassActivity extends AppCompatActivity {
     }
 
     private void setupObservers() {
-        List<User> usersList = users.getValue();
-        if (usersList == null) {
-            return;
-        }
-        System.out.println("SETTING UP");
         for (User user : usersList) {
             if (user.public_code.equals(main_public_uid)) {
                 continue;
@@ -301,7 +299,7 @@ public class CompassActivity extends AppCompatActivity {
                 lastMainLat = location.first;
                 lastMainLong = location.second;
 
-                User mainUser = viewModel.getUser(main_public_uid);
+                User mainUser = viewModel.getUserNotLive(main_public_uid);
                 mainUser.setLatitude(lastMainLat);
                 mainUser.setLongitude(lastMainLong);
 

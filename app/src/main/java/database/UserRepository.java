@@ -88,16 +88,20 @@ public class UserRepository {
         dao.update(user);
     }
 
-    public LiveData<User> getLocalLive(String public_code) {
-        return dao.getLive(public_code);
+    public LiveData<User> getLocal(String public_code) {
+        return dao.get(public_code);
     }
 
-    public User getLocal(String public_code) {
-        return dao.get(public_code);
+    public User getLocalNotLive(String public_code) {
+        return dao.getNotLive(public_code);
     }
 
     public LiveData<List<User>> getAllLocal() {
         return dao.getAll();
+    }
+
+    public List<User> getAllLocalNotLive() {
+        return dao.getAllNotLive();
     }
 
     public void upsertLocal(User user) {
