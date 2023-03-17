@@ -26,6 +26,11 @@ public class LocationView {
         this.statusView = itemView.findViewById(R.id.indicator);
         this.timeView = itemView.findViewById(R.id.last_live);
 
+        this.itemView.setId(View.generateViewId());
+        this.nameView.setId(View.generateViewId());
+        this.statusView.setId(View.generateViewId());
+        this.timeView.setId(View.generateViewId());
+
         update(user);
     }
 

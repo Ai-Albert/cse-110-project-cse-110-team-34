@@ -74,9 +74,9 @@ public class NewFriendTest {
         scenario.onActivity(activity -> {
             EditText code = activity.findViewById(R.id.public_code);
             Button submit = activity.findViewById(R.id.submit_new_friend);
-            code.setText("point-nemo");
+            code.setText("testing-testing-123");
             submit.performClick();
-            assertEquals(repo.existsLocal("point-nemo"), true);
+            assertEquals(repo.existsLocal("testing-testing-123"), true);
         });
     }
 
