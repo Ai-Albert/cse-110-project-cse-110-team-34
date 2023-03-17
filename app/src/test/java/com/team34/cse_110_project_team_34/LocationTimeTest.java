@@ -75,7 +75,7 @@ public class LocationTimeTest {
     public void testIndicator() {
         scenario.onActivity(activity -> {
             ConstraintLayout layout = activity.findViewById(R.id.mainLayout);
-            Map<String, LocationView> views = activity.getLocationsViews();
+            Map<String, LocationView> views = activity.locationViews;
             LocationView view = views.get(public_code);
             assertNotNull("Invalid View", view);
             assertEquals(view.statusView.getTag(), R.drawable.green_indicator);
@@ -94,7 +94,7 @@ public class LocationTimeTest {
     public void testTimer() {
         scenario.onActivity(activity -> {
             ConstraintLayout layout = activity.findViewById(R.id.mainLayout);
-            Map<String, LocationView> views = activity.getLocationsViews();
+            Map<String, LocationView> views = activity.locationViews;
             LocationView view = views.get(public_code);
             assertNotNull("Invalid View", view);
             assertEquals(view.timeView.getVisibility(), View.INVISIBLE);
@@ -115,7 +115,7 @@ public class LocationTimeTest {
         scenario.moveToState(Lifecycle.State.RESUMED);
         scenario.onActivity(activity -> {
             ConstraintLayout layout = activity.findViewById(R.id.mainLayout);
-            Map<String, LocationView> views = activity.getLocationsViews();
+            Map<String, LocationView> views = activity.locationViews;
             LocationView view = views.get(public_code);
             assertNotNull("Invalid View", view);
             assertEquals(view.timeView.getVisibility(), View.INVISIBLE);
@@ -133,7 +133,7 @@ public class LocationTimeTest {
         repo.updateLocal(user);
         scenario.onActivity(activity -> {
             ConstraintLayout layout = activity.findViewById(R.id.mainLayout);
-            Map<String, LocationView> views = activity.getLocationsViews();
+            Map<String, LocationView> views = activity.locationViews;
             LocationView view = views.get(public_code);
             assertNotNull("Invalid View", view);
 
@@ -147,7 +147,7 @@ public class LocationTimeTest {
         new_scenario.moveToState(Lifecycle.State.RESUMED);
         new_scenario.onActivity(activity -> {
             ConstraintLayout layout = activity.findViewById(R.id.mainLayout);
-            Map<String, LocationView> views = activity.getLocationsViews();
+            Map<String, LocationView> views = activity.locationViews;
             LocationView view = views.get(public_code);
             assertNotNull("Invalid View", view);
             assertEquals(view.statusView.getTag(), R.drawable.green_indicator);

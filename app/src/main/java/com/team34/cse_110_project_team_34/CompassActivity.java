@@ -1,6 +1,5 @@
 package com.team34.cse_110_project_team_34;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -9,8 +8,6 @@ import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 
-
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -40,9 +37,9 @@ import viewModel.LocationViewModel;
 public class CompassActivity extends AppCompatActivity {
 
     private UserRepository userRepo;
-    private SharedPreferences preferences;
     private OrientationService orientationService;
     private LocationService locationService;
+    SharedPreferences preferences;
     private LocationViewModel viewModel;
 
     private String main_public_uid;
@@ -77,22 +74,23 @@ public class CompassActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compass);
 
-        UserDao dao = Database.getInstance(this).getUserDao();
+        // Setting up services
+        orientationService = OrientationService.getInstance(this);
+        locationService = LocationService.getInstance(this);
 
-        SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
+        // Main user's uid info
+        preferences = getSharedPreferences("preferences", MODE_PRIVATE);
+        main_public_uid = preferences.getString("Public", "");
+        main_private_uid = preferences.getString("Private", "");
+
+        // API mocking
+        UserDao dao = Database.getInstance(this).getUserDao();
         String link = preferences.getString("API_Link", "");
         if (link.equals("")) {
             userRepo = new UserRepository(dao);
         } else {
             userRepo = new UserRepository(dao, link);
         }
-
-        orientationService = OrientationService.getInstance(this);
-        locationService = LocationService.getInstance(this);
-
-        main_public_uid = preferences.getString("Public", "");
-        main_private_uid = preferences.getString("Private", "");
-
 
         // Getting the current user's public uid
         TextView public_uid_text = this.findViewById(R.id.public_uid);
@@ -130,7 +128,6 @@ public class CompassActivity extends AppCompatActivity {
         lastMainLong = locationService.getLocation().getValue() != null ? locationService.getLocation().getValue().second : 0;
 
         setupObservers();
-
         updateCircles();
         observeLocation();
         observeOrientation();
@@ -183,10 +180,8 @@ public class CompassActivity extends AppCompatActivity {
             }
             locationViews.get(user.public_code).update(user);
             updateCompassLocation(user);
-
         }
     }
-
 
     /**
      * Displays a user's location marker on the compass.
@@ -400,7 +395,4 @@ public class CompassActivity extends AppCompatActivity {
         return userView;
     }
 
-    public Map<String, LocationView> getLocationsViews() {
-        return locationViews;
-    }
 }

@@ -33,20 +33,20 @@ public class ZoomTest {
     @Test
     public void testZoomIn() {
         scenario.onActivity(activity -> {
-            assertEquals(20, activity.radius, 1);
+            assertEquals(10, activity.radius, 1);
             Button zoomIn = activity.findViewById(R.id.zoomInButton);
             zoomIn.performClick();
-            assertEquals(10, activity.radius, 1);
+            assertEquals(1, activity.radius, 1);
         });
     }
 
     @Test
     public void testZoomOut() {
         scenario.onActivity(activity -> {
-            assertEquals(20, activity.radius, 1);
+            assertEquals(10, activity.radius, 1);
             Button zoomOut = activity.findViewById(R.id.zoomOutButton);
             zoomOut.performClick();
-            assertEquals(40, activity.radius, 1);
+            assertEquals(500, activity.radius, 1);
         });
     }
 }
