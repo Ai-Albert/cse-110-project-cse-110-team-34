@@ -102,5 +102,41 @@ public class LocationTimeTest {
         });
     }
 
-    
+    /**
+     * When I open the app while my friend is online,
+     * Then their indicator and timer should be correct
+     * If I reopen the app, even if I disconnect, the two should be still the same.
+     */
+    @Test
+    public void testStory() {
+        user.setLastUpdated(user.getLastUpdated() - 300);
+        repo.updateLocal(user);
+        scenario.onActivity(activity -> {
+            ConstraintLayout layout = activity.findViewById(R.id.mainLayout);
+            Map<String, LocationView> views = activity.getLocationsViews();
+            LocationView view = views.get(public_code);
+            assertNotNull("Invalid View", view);
+
+            String expected_text = "6m";
+            assertEquals(view.timeView.getText().toString(), expected_text);
+            assertEquals(view.statusView.getTag(), R.drawable.green_indicator);
+        });
+        ActivityScenario<CompassActivity> new_scenario;
+        new_scenario = ActivityScenario.launch(CompassActivity.class);
+        new_scenario.moveToState(Lifecycle.State.CREATED);
+        new_scenario.moveToState(Lifecycle.State.STARTED);
+        new_scenario.moveToState(Lifecycle.State.RESUMED);
+        new_scenario.onActivity(activity -> {
+            ConstraintLayout layout = activity.findViewById(R.id.mainLayout);
+            Map<String, LocationView> views = activity.getLocationsViews();
+            LocationView view = views.get(public_code);
+            assertNotNull("Invalid View", view);
+
+            String expected_text = "6m";
+            assertEquals(view.timeView.getText().toString(), expected_text);
+            assertEquals(view.statusView.getTag(), R.drawable.green_indicator);
+        });
+    }
+
+
 }
