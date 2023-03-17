@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import database.Database;
 import database.UserRepository;
@@ -87,6 +90,11 @@ public class CompassActivity extends AppCompatActivity {
         LocationViewModel viewModel = setupViewModel();
         users = viewModel.getUsers();
         users.observe(this, this::updateFriendLocations);
+//        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+//        executor.scheduleAtFixedRate(() -> {
+//            users = viewModel.getUsers();
+//            updateFriendLocations(users.getValue());
+//        }, 0, 3000, TimeUnit.MILLISECONDS);
         locationViews = new HashMap<>();
 
         // Getting the current user's public uid
@@ -102,7 +110,7 @@ public class CompassActivity extends AppCompatActivity {
         if (radiusIndex == 0) {
             setNotClickable(findViewById(R.id.zoomInButton));
         }
-        else if (radiusIndex == 2) {
+        else if (radiusIndex == 3) {
             setNotClickable(findViewById(R.id.zoomOutButton));
         }
 
