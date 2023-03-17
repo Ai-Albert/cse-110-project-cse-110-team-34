@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
         }
         SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
+
         SharedPreferences.Editor editor = preferences.edit();
         // TODO: Remove this during demo
         editor.clear();

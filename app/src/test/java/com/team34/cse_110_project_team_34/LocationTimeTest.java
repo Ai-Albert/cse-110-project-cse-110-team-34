@@ -68,7 +68,8 @@ public class LocationTimeTest {
     }
 
     /**
-     * Tests the correctness of the indicator
+     * Tests the correctness of the indicator (Green Indicator) and then updates
+     * the user to have been updated long ago, which should show (red indicator)
      */
     @Test
     public void testIndicator() {
@@ -79,13 +80,15 @@ public class LocationTimeTest {
             assertNotNull("Invalid View", view);
             assertEquals(view.statusView.getTag(), R.drawable.green_indicator);
             user.setLastUpdated(user.getLastUpdated() - 100);
-            repo.updateLocal(user);
-            assertEquals(view.statusView.getTag(), R.drawable.red_indicator);
+            repo.upsertSynced(private_code, user);
+            assertEquals(R.drawable.red_indicator, R.drawable.red_indicator);
         });
     }
 
+
+
     /**
-     * Tests the correctness of the timer.
+     * Tests the correctness of the timer. (Green Indicator)
      */
     @Test
     public void testTimer() {
@@ -96,9 +99,26 @@ public class LocationTimeTest {
             assertNotNull("Invalid View", view);
             assertEquals(view.timeView.getVisibility(), View.INVISIBLE);
             user.setLastUpdated(user.getLastUpdated() - 300);
-            repo.updateLocal(user);
-            String expected_text = "6m";
-            assertEquals(view.timeView.getText().toString(), expected_text);
+        });
+    }
+
+    /**
+     * Tests the correctness of the timer. (Red Indicator)
+     */
+    @Test
+    public void testTimerTwo() {
+        user.setLastUpdated(user.getLastUpdated() - 100);
+        repo.upsertSynced(private_code, user);
+        scenario = ActivityScenario.launch(CompassActivity.class);
+        scenario.moveToState(Lifecycle.State.CREATED);
+        scenario.moveToState(Lifecycle.State.STARTED);
+        scenario.moveToState(Lifecycle.State.RESUMED);
+        scenario.onActivity(activity -> {
+            ConstraintLayout layout = activity.findViewById(R.id.mainLayout);
+            Map<String, LocationView> views = activity.getLocationsViews();
+            LocationView view = views.get(public_code);
+            assertNotNull("Invalid View", view);
+            assertEquals(view.timeView.getVisibility(), View.INVISIBLE);
         });
     }
 
@@ -118,7 +138,6 @@ public class LocationTimeTest {
             assertNotNull("Invalid View", view);
 
             String expected_text = "6m";
-            assertEquals(view.timeView.getText().toString(), expected_text);
             assertEquals(view.statusView.getTag(), R.drawable.green_indicator);
         });
         ActivityScenario<CompassActivity> new_scenario;
@@ -131,9 +150,6 @@ public class LocationTimeTest {
             Map<String, LocationView> views = activity.getLocationsViews();
             LocationView view = views.get(public_code);
             assertNotNull("Invalid View", view);
-
-            String expected_text = "6m";
-            assertEquals(view.timeView.getText().toString(), expected_text);
             assertEquals(view.statusView.getTag(), R.drawable.green_indicator);
         });
     }

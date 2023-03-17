@@ -30,6 +30,7 @@ public class UserAPI {
         default_link = "https://socialcompass.goto.ucsd.edu/location/";
         // In case of sabotage
 //        default_link = "https://vs2961.pythonanywhere.com/";
+
     }
 
     public UserAPI(String new_link) {

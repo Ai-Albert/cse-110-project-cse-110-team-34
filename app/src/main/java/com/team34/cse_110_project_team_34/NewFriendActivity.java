@@ -58,8 +58,7 @@ public class NewFriendActivity extends AppCompatActivity {
      * Goes back to compass view without adding a friend
      **/
     public void onBack(View view) {
-        Intent intent = new Intent(this, CompassActivity.class);
-        startActivity(intent);
+        finish();
     }
 
     public void onSubmitNewLink(View view) {
@@ -67,7 +66,6 @@ public class NewFriendActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("API_Link", api_link.getText().toString());
         editor.apply();
-        Intent intent = new Intent(this, CompassActivity.class);
-        startActivity(intent);
+        finish();
     }
 }
