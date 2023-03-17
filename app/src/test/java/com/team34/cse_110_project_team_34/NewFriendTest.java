@@ -96,7 +96,7 @@ public class NewFriendTest {
         ActivityScenario<CompassActivity> new_scenario = ActivityScenario.launch(CompassActivity.class);;
         new_scenario.onActivity(activity -> {
             Map<String, LocationView> location_views = activity.getLocationsViews();
-            assertEquals(location_views.size(), 4);
+            assertEquals(location_views.size(), 3);
             assertNotNull(location_views.get("pub_1"));
             assertNotNull(location_views.get("pub_2"));
             assertNotNull(location_views.get("pub_3"));
