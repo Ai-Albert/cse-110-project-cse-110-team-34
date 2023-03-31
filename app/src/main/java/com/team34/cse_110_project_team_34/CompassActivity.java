@@ -222,12 +222,34 @@ public class CompassActivity extends AppCompatActivity {
             azimuth = 0;
         }
 
+        for (LocationView view : locationViews.values()) {
+            if (overlaps(userView.itemView, view.itemView)) {
+                azimuth += 13;
+                break;
+            }
+        }
+
         // Setting new constraint based on angle and radius
         ConstraintSet constraintSet = new ConstraintSet();
         constraintSet.clone((ConstraintLayout) findViewById(R.id.mainLayout));
         constraintSet.constrainCircle(userView.itemView.getId(), compassLayout.getId(), compassRadius, azimuth);
         constraintSet.applyTo(findViewById(R.id.mainLayout));
         userView.itemView.bringToFront();
+    }
+
+    private boolean overlaps(View firstView, View secondView) {
+        int[] firstPosition = new int[2];
+        int[] secondPosition = new int[2];
+
+        firstView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        firstView.getLocationOnScreen(firstPosition);
+        secondView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        secondView.getLocationOnScreen(secondPosition);
+
+        return firstPosition[0] < secondPosition[0] + secondView.getMeasuredWidth()
+                && firstPosition[0] + firstView.getMeasuredWidth() > secondPosition[0]
+                && firstPosition[1] < secondPosition[1] + secondView.getMeasuredHeight()
+                && firstPosition[1] + firstView.getMeasuredHeight() > secondPosition[1];
     }
 
     /**
